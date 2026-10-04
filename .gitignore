@@ -5,3 +5,4 @@ build-signed/
 .DS_Store
 *.xcuserstate
 xcuserdata/
+OpenConnectGUI.xcodeproj/xcshareddata/

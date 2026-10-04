@@ -1,4 +1,21 @@
 name: OpenConnectGUI
+schemes:
+  OpenConnectGUI:
+    build:
+      targets:
+        OpenConnectGUI: all
+  OpenConnectPrivilegedHelper:
+    build:
+      targets:
+        OpenConnectPrivilegedHelper: all
+  OpenConnectiOS:
+    build:
+      targets:
+        OpenConnectiOS: all
+  OpenConnectPacketTunnel:
+    build:
+      targets:
+        OpenConnectPacketTunnel: all
 options:
   bundleIdPrefix: xyz.nows
   deploymentTarget:
