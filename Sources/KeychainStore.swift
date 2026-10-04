@@ -23,18 +23,14 @@ enum KeychainStore {
             try delete(for: id)
             return
         }
-        let data = Data(password.utf8)
+        // Replace rather than update so the item always lands in the default
+        // access group, which on iOS is the group shared with the VPN extension.
+        try delete(for: id)
         let status = SecItemAdd(query(for: id).merging([
-            kSecValueData as String: data,
+            kSecValueData as String: Data(password.utf8),
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         ]) { _, new in new } as CFDictionary, nil)
-        if status == errSecDuplicateItem {
-            let update = SecItemUpdate(query(for: id) as CFDictionary,
-                                       [kSecValueData as String: data] as CFDictionary)
-            guard update == errSecSuccess else { throw keychainError(update) }
-        } else if status != errSecSuccess {
-            throw keychainError(status)
-        }
+        guard status == errSecSuccess else { throw keychainError(status) }
     }
 
     static func delete(for id: UUID) throws {

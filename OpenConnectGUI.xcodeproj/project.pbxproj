@@ -17,18 +17,29 @@
 		512A6C7DE555D3846527B5B8 /* PacketFlowBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256C071D7DC8F55898F31A3F /* PacketFlowBridge.swift */; };
 		576BF855EC1E20F0204812A6 /* OpenConnectPacketTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B67BBA81ACB9FB5D7E493F9E /* OpenConnectPacketTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6C736A25265505BE3BC13952 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF7909757632D23F9816AD2 /* AppModel.swift */; };
+		6FDAB392F5104FE4458897A3 /* OpenConnectSession.c in Sources */ = {isa = PBXBuildFile; fileRef = F59D3A5342D1BD98CBC40BCF /* OpenConnectSession.c */; };
 		7401D9ECD473B88DFDA060A0 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
+		7566BBA81BB7BE04BDAEB573 /* TunnelLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20BF7B95CC39BECF242504E2 /* TunnelLog.swift */; };
 		82BECB28150420FC30D7B4FD /* MobileProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9787F4DACAC945539655F7B8 /* MobileProfileStore.swift */; };
 		889BF614BF02FDB1F925094D /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
 		92C8B38D554972CC47157C3D /* NetworkPathObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08F4338C09F6C57EE7461F9E /* NetworkPathObserver.swift */; };
+		9965E8F6879287BC4D15E003 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 771060E11B654DBA4E1AC53B /* KeychainStore.swift */; };
 		9CA766059FB7B8CB68F4B5FD /* OpenConnectGUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1365DF5B210A3BFC7444A29 /* OpenConnectGUIApp.swift */; };
+		9DA426F5C1E0CFD0D63250A0 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D78A8EEF8021FCEF6456AB7E /* libxml2.tbd */; };
 		A473D231A7FA141126FBCDCE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89D3C34D9DE620E4F88D9910 /* Assets.xcassets */; };
+		B20902AC8920A7F69E460EBD /* openconnect in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5157482F725042E23C8EC2D /* openconnect */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BCC9FA7C3C62FA48926164C8 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 59232A5AE8CB9812C5E6188A /* libz.tbd */; };
+		C3E0ADD8548FA5A8FC896CC5 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 260503F3DAC67E7EA7BA5189 /* libiconv.tbd */; };
 		D6B2C5BB10CF0AE620387891 /* vpnc-wrapper.sh in Resources */ = {isa = PBXBuildFile; fileRef = E345363780A0B5EDC2E0872F /* vpnc-wrapper.sh */; };
 		DFCB79812B388EFD18CE558B /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 959373107C77E2944FE8165C /* ProfileStore.swift */; };
+		E536FA9FF1622C42F5E30595 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 856AA14F45B979CCABBF30B1 /* Security.framework */; };
 		E93C56A6654FB5572ECCE6B3 /* PrivilegedCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C64E5B19CA3FDC7D87BA6FA /* PrivilegedCommand.swift */; };
 		EB3B7598D5CDAB3368D4C708 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 771060E11B654DBA4E1AC53B /* KeychainStore.swift */; };
+		EC97A0EB0A039FA6EC6C55AC /* OpenConnect.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04BA9CAD8220E05D4C4D5687 /* OpenConnect.xcframework */; };
 		F79BF48D98278DF457AC22E9 /* OpenConnectMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B00F355CDA87714228CA /* OpenConnectMobileApp.swift */; };
+		F7C3D53AE288ED19DC51E602 /* OpenConnectTunnel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743FC707274CB8FA6172DF4 /* OpenConnectTunnel.swift */; };
 		F80144B0065165BB913B2CE2 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
+		FA59AF06C6BB0DE54D276D4C /* vpnc-script in Resources */ = {isa = PBXBuildFile; fileRef = F3BFF654B67096FDC678CDB3 /* vpnc-script */; };
 		FCEC46B48FC2D89C1E7C475A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CBFC0625B37175B4FA04072 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +61,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		38DCFE25BBD3A5ECA00F8AC8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				B20902AC8920A7F69E460EBD /* openconnect in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		56AEF36C4739186091D4D2E6 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -64,29 +85,55 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04BA9CAD8220E05D4C4D5687 /* OpenConnect.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OpenConnect.xcframework; path = Vendor/OpenConnect/OpenConnect.xcframework; sourceTree = "<group>"; };
 		06CF42CB6A543D5340D4A866 /* HelperProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperProtocol.swift; sourceTree = "<group>"; };
 		08F4338C09F6C57EE7461F9E /* NetworkPathObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPathObserver.swift; sourceTree = "<group>"; };
 		20AE82F716F3718721AACB74 /* OpenConnectPrivilegedHelper */ = {isa = PBXFileReference; includeInIndex = 0; path = OpenConnectPrivilegedHelper; sourceTree = BUILT_PRODUCTS_DIR; };
+		20BF7B95CC39BECF242504E2 /* TunnelLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelLog.swift; sourceTree = "<group>"; };
 		256C071D7DC8F55898F31A3F /* PacketFlowBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketFlowBridge.swift; sourceTree = "<group>"; };
+		260503F3DAC67E7EA7BA5189 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		2743FC707274CB8FA6172DF4 /* OpenConnectTunnel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectTunnel.swift; sourceTree = "<group>"; };
 		2CBFC0625B37175B4FA04072 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3C64E5B19CA3FDC7D87BA6FA /* PrivilegedCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedCommand.swift; sourceTree = "<group>"; };
+		3EAB0BE7CB85D8DBA4C68E15 /* Tunnel-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tunnel-Bridging-Header.h"; sourceTree = "<group>"; };
+		4F86242FE6E0F6C3DA378310 /* OpenConnectSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenConnectSession.h; sourceTree = "<group>"; };
+		59232A5AE8CB9812C5E6188A /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		5EF7909757632D23F9816AD2 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		771060E11B654DBA4E1AC53B /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		82B659AEA68005F8722ABD07 /* OpenConnectGUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenConnectGUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8338B00F355CDA87714228CA /* OpenConnectMobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectMobileApp.swift; sourceTree = "<group>"; };
+		856AA14F45B979CCABBF30B1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		89D3C34D9DE620E4F88D9910 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8A50EE8B17684AE3B688FC1C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		8A9E513836DD77546AF275DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		959373107C77E2944FE8165C /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
 		9787F4DACAC945539655F7B8 /* MobileProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileProfileStore.swift; sourceTree = "<group>"; };
 		9CDBE2B92725AD4649F7B815 /* OpenConnectiOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OpenConnectiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1A707CC63006F349D53F08B /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
 		B67BBA81ACB9FB5D7E493F9E /* OpenConnectPacketTunnel.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = OpenConnectPacketTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1365DF5B210A3BFC7444A29 /* OpenConnectGUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectGUIApp.swift; sourceTree = "<group>"; };
+		C5157482F725042E23C8EC2D /* openconnect */ = {isa = PBXFileReference; path = openconnect; sourceTree = "<group>"; };
+		D78A8EEF8021FCEF6456AB7E /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		DA0D1C043B4E411B44A587E9 /* OpenConnectController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectController.swift; sourceTree = "<group>"; };
 		DE4FF96F129C9955E8E7DAAB /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		E345363780A0B5EDC2E0872F /* vpnc-wrapper.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "vpnc-wrapper.sh"; sourceTree = "<group>"; };
+		F3BFF654B67096FDC678CDB3 /* vpnc-script */ = {isa = PBXFileReference; path = "vpnc-script"; sourceTree = "<group>"; };
+		F59D3A5342D1BD98CBC40BCF /* OpenConnectSession.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = OpenConnectSession.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DBEDFE51BD12C6B7479FD680 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC97A0EB0A039FA6EC6C55AC /* OpenConnect.xcframework in Frameworks */,
+				9DA426F5C1E0CFD0D63250A0 /* libxml2.tbd in Frameworks */,
+				BCC9FA7C3C62FA48926164C8 /* libz.tbd in Frameworks */,
+				C3E0ADD8548FA5A8FC896CC5 /* libiconv.tbd in Frameworks */,
+				E536FA9FF1622C42F5E30595 /* Security.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		15BDFDB1B0E86E8CD358031C /* Sources */ = {
@@ -108,9 +155,13 @@
 		2A7673BE8FEB30C9F2EFF25E /* Tunnel */ = {
 			isa = PBXGroup;
 			children = (
-				8A9E513836DD77546AF275DC /* Info.plist */,
+				F59D3A5342D1BD98CBC40BCF /* OpenConnectSession.c */,
+				4F86242FE6E0F6C3DA378310 /* OpenConnectSession.h */,
+				2743FC707274CB8FA6172DF4 /* OpenConnectTunnel.swift */,
 				256C071D7DC8F55898F31A3F /* PacketFlowBridge.swift */,
 				B1A707CC63006F349D53F08B /* PacketTunnelProvider.swift */,
+				3EAB0BE7CB85D8DBA4C68E15 /* Tunnel-Bridging-Header.h */,
+				20BF7B95CC39BECF242504E2 /* TunnelLog.swift */,
 			);
 			name = Tunnel;
 			path = iOS/Tunnel;
@@ -132,11 +183,23 @@
 				41951F88611E39ED09234D51 /* App */,
 				D1371AAA890CF8B901912570 /* Helper */,
 				99A0D39FEB990AF8E857C463 /* iOS */,
+				DC10F4CA0CBE57D700C62D18 /* macos */,
+				882FC1432F571F79F8C2B255 /* OpenConnect */,
 				AD79DE8DD2DD7A3034516D01 /* Resources */,
 				15BDFDB1B0E86E8CD358031C /* Sources */,
 				2A7673BE8FEB30C9F2EFF25E /* Tunnel */,
+				BA284CA3E755B4A2AC859796 /* Frameworks */,
 				8FF6F5CC22DF68066D1FDED7 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		882FC1432F571F79F8C2B255 /* OpenConnect */ = {
+			isa = PBXGroup;
+			children = (
+				F3BFF654B67096FDC678CDB3 /* vpnc-script */,
+			);
+			name = OpenConnect;
+			path = Vendor/OpenConnect;
 			sourceTree = "<group>";
 		};
 		8FF6F5CC22DF68066D1FDED7 /* Products */ = {
@@ -166,6 +229,18 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		BA284CA3E755B4A2AC859796 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				260503F3DAC67E7EA7BA5189 /* libiconv.tbd */,
+				D78A8EEF8021FCEF6456AB7E /* libxml2.tbd */,
+				59232A5AE8CB9812C5E6188A /* libz.tbd */,
+				04BA9CAD8220E05D4C4D5687 /* OpenConnect.xcframework */,
+				856AA14F45B979CCABBF30B1 /* Security.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		D1371AAA890CF8B901912570 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
@@ -173,6 +248,15 @@
 				E345363780A0B5EDC2E0872F /* vpnc-wrapper.sh */,
 			);
 			path = Helper;
+			sourceTree = "<group>";
+		};
+		DC10F4CA0CBE57D700C62D18 /* macos */ = {
+			isa = PBXGroup;
+			children = (
+				C5157482F725042E23C8EC2D /* openconnect */,
+			);
+			name = macos;
+			path = Vendor/OpenConnect/macos;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -184,6 +268,7 @@
 			buildPhases = (
 				7CD1485055A820FB4B186641 /* Sources */,
 				5D0157285A870FEDF3E078F6 /* Resources */,
+				38DCFE25BBD3A5ECA00F8AC8 /* CopyFiles */,
 				B361A7694C3498E8392C1687 /* Embed privileged helper */,
 			);
 			buildRules = (
@@ -240,6 +325,7 @@
 			buildConfigurationList = 4E93AEACDA688AB2047D2999 /* Build configuration list for PBXNativeTarget "OpenConnectPacketTunnel" */;
 			buildPhases = (
 				2BB3287E8E1C712C8CCB9784 /* Sources */,
+				DBEDFE51BD12C6B7479FD680 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -265,9 +351,17 @@
 						DevelopmentTeam = SWKH4B9DH8;
 						ProvisioningStyle = Manual;
 					};
+					42C752989CBAA7D705831C39 = {
+						DevelopmentTeam = SWKH4B9DH8;
+						ProvisioningStyle = Automatic;
+					};
 					DB827C2A2268E159D6D8D2B2 = {
 						DevelopmentTeam = SWKH4B9DH8;
 						ProvisioningStyle = Manual;
+					};
+					E2CEC0B8FE4C88FC103E0D2E = {
+						DevelopmentTeam = SWKH4B9DH8;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -286,9 +380,9 @@
 			projectRoot = "";
 			targets = (
 				20002E9F36A7778B4AA485DA /* OpenConnectGUI */,
+				E2CEC0B8FE4C88FC103E0D2E /* OpenConnectPacketTunnel */,
 				DB827C2A2268E159D6D8D2B2 /* OpenConnectPrivilegedHelper */,
 				42C752989CBAA7D705831C39 /* OpenConnectiOS */,
-				E2CEC0B8FE4C88FC103E0D2E /* OpenConnectPacketTunnel */,
 			);
 		};
 /* End PBXProject section */
@@ -299,6 +393,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FCEC46B48FC2D89C1E7C475A /* Assets.xcassets in Resources */,
+				FA59AF06C6BB0DE54D276D4C /* vpnc-script in Resources */,
 				D6B2C5BB10CF0AE620387891 /* vpnc-wrapper.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -330,7 +425,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -eu\nmkdir -p \"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons\"\ncp \"$BUILT_PRODUCTS_DIR/OpenConnectPrivilegedHelper\" \"$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper\"\ncp \"$SRCROOT/Helper/xyz.nows.openconnect.privileged.plist\" \"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons/\"\nchmod 755 \"$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/vpnc-wrapper.sh\"\n";
+			shellScript = "set -eu\nmkdir -p \"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons\"\ncp \"$BUILT_PRODUCTS_DIR/OpenConnectPrivilegedHelper\" \"$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper\"\ncp \"$SRCROOT/Helper/xyz.nows.openconnect.privileged.plist\" \"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons/\"\nchmod 755 \"$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper\" \"$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/openconnect\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/vpnc-wrapper.sh\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/vpnc-script\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -350,9 +445,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9965E8F6879287BC4D15E003 /* KeychainStore.swift in Sources */,
+				6FDAB392F5104FE4458897A3 /* OpenConnectSession.c in Sources */,
+				F7C3D53AE288ED19DC51E602 /* OpenConnectTunnel.swift in Sources */,
 				512A6C7DE555D3846527B5B8 /* PacketFlowBridge.swift in Sources */,
 				213E60969BEABFE4795B3C55 /* PacketTunnelProvider.swift in Sources */,
 				7401D9ECD473B88DFDA060A0 /* Profile.swift in Sources */,
+				7566BBA81BB7BE04BDAEB573 /* TunnelLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,10 +500,13 @@
 		0119AAB0A203DF259954C882 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = iOS/App.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SWKH4B9DH8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = OpenConnect;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -426,6 +528,7 @@
 		06EAE0946FB070DC490AC0FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application: Fazheng Li (SWKH4B9DH8)";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
@@ -447,6 +550,7 @@
 		18BCE46F2111080EF931F509 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application: Fazheng Li (SWKH4B9DH8)";
@@ -591,8 +695,16 @@
 		823FAAB8780C7395B1424767 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CODE_SIGN_ENTITLEMENTS = iOS/Tunnel.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SWKH4B9DH8;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"Vendor/OpenConnect\"",
+				);
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor/OpenConnect/OpenConnect.xcframework/ios-arm64/Headers";
 				INFOPLIST_FILE = iOS/Tunnel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -603,6 +715,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect.tunnel;
 				PRODUCT_NAME = OpenConnectPacketTunnel;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "iOS/Tunnel/Tunnel-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -611,8 +724,16 @@
 		8F53FC36426E32B537574FD7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CODE_SIGN_ENTITLEMENTS = iOS/Tunnel.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SWKH4B9DH8;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"Vendor/OpenConnect\"",
+				);
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor/OpenConnect/OpenConnect.xcframework/ios-arm64/Headers";
 				INFOPLIST_FILE = iOS/Tunnel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -623,6 +744,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect.tunnel;
 				PRODUCT_NAME = OpenConnectPacketTunnel;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "iOS/Tunnel/Tunnel-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -631,10 +753,13 @@
 		94C081BC432C65680ED8B94F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = iOS/App.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SWKH4B9DH8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = OpenConnect;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -656,6 +781,7 @@
 		AEE20E2FC26EFD17B8CBA35C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application: Fazheng Li (SWKH4B9DH8)";
@@ -681,6 +807,7 @@
 		ED51D3D353AD84E2868B22B8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application: Fazheng Li (SWKH4B9DH8)";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;

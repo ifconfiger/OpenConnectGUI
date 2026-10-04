@@ -62,13 +62,21 @@ private func shellQuote(_ value: String) -> String {
     "'" + value.replacingOccurrences(of: "'", with: "'\\''") + "'"
 }
 
-private func installedResource(_ name: String) -> String? {
+private func executableDirectory() -> URL? {
     var buffer = [CChar](repeating: 0, count: Int(PATH_MAX))
     var size = UInt32(buffer.count)
     guard _NSGetExecutablePath(&buffer, &size) == 0 else { return nil }
-    return URL(fileURLWithPath: String(cString: buffer))
-        .deletingLastPathComponent().deletingLastPathComponent()
+    return URL(fileURLWithPath: String(cString: buffer)).resolvingSymlinksInPath().deletingLastPathComponent()
+}
+
+private func installedResource(_ name: String) -> String? {
+    executableDirectory()?.deletingLastPathComponent()
         .appendingPathComponent("Resources").appendingPathComponent(name).path
+}
+
+/// OpenConnect and vpnc-script ship inside the app bundle next to this helper.
+private func bundledOpenConnect() -> String? {
+    executableDirectory()?.appendingPathComponent("openconnect").path
 }
 
 private final class HelperSession: NSObject, OpenConnectHelperProtocol {
@@ -93,12 +101,11 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
               isOwnedFile(directory.appendingPathComponent("openconnect.log").path, uid: uid) else {
             return (-1, "连接参数或会话目录无效。")
         }
-        let binary = ["/opt/homebrew/bin/openconnect", "/usr/local/bin/openconnect"]
-            .first { FileManager.default.isExecutableFile(atPath: $0) }
-        guard let binary else { return (-1, "未找到 OpenConnect。") }
-        let prefix = binary.hasPrefix("/opt/homebrew/") ? "/opt/homebrew" : "/usr/local"
-        let vpncScript = prefix + "/etc/vpnc/vpnc-script"
-        guard FileManager.default.isExecutableFile(atPath: vpncScript) else { return (-1, "未找到 vpnc-script。") }
+        guard let binary = bundledOpenConnect(), FileManager.default.isExecutableFile(atPath: binary) else {
+            return (-1, "App 内置的 OpenConnect 缺失，请重新安装应用。")
+        }
+        guard let vpncScript = installedResource("vpnc-script"),
+              FileManager.default.isExecutableFile(atPath: vpncScript) else { return (-1, "未找到 vpnc-script。") }
         guard let wrapper = installedResource("vpnc-wrapper.sh"),
               FileManager.default.isExecutableFile(atPath: wrapper) else {
             return (-1, "未找到内置网络脚本。")
@@ -133,6 +140,8 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
         task.arguments = args
         task.standardOutput = log
         task.standardError = log
+        // The bundled OpenSSL trusts the macOS system CA bundle.
+        task.environment = ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin", "SSL_CERT_FILE": "/etc/ssl/cert.pem"]
         let input = Pipe()
         task.standardInput = input
         do {
@@ -190,10 +199,7 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
                 if pair.count == 2 { environment[String(pair[0])] = String(pair[1]) }
             }
             environment["reason"] = "disconnect"
-            let prefix = FileManager.default.isExecutableFile(atPath: "/opt/homebrew/bin/openconnect")
-                ? "/opt/homebrew" : "/usr/local"
-            let script = prefix + "/etc/vpnc/vpnc-script"
-            _ = run(script, [], environment: environment)
+            if let script = installedResource("vpnc-script") { _ = run(script, [], environment: environment) }
             try? FileManager.default.removeItem(atPath: state)
         }
         return waitForExit(pidFiles, seconds: 2) ? (0, "") : (-1, "OpenConnect 没有响应断开请求。")

@@ -13,6 +13,13 @@ targets:
       - path: Resources/Assets.xcassets
       - path: Helper/vpnc-wrapper.sh
         buildPhase: resources
+      - path: Vendor/OpenConnect/vpnc-script
+        buildPhase: resources
+      - path: Vendor/OpenConnect/macos/openconnect
+        buildPhase:
+          copyFiles:
+            destination: executables
+        attributes: [CodeSignOnCopy]
     dependencies:
       - target: OpenConnectPrivilegedHelper
         embed: false
@@ -23,13 +30,14 @@ targets:
           mkdir -p "$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons"
           cp "$BUILT_PRODUCTS_DIR/OpenConnectPrivilegedHelper" "$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper"
           cp "$SRCROOT/Helper/xyz.nows.openconnect.privileged.plist" "$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons/"
-          chmod 755 "$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/vpnc-wrapper.sh"
+          chmod 755 "$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper" "$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/openconnect" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/vpnc-wrapper.sh" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/vpnc-script"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: xyz.nows.openconnect
         PRODUCT_NAME: OpenConnectGUI
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SWIFT_VERSION: 5.0
+        ARCHS: arm64
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: OpenConnect GUI
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
@@ -51,6 +59,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: xyz.nows.openconnect.privileged
         PRODUCT_NAME: OpenConnectPrivilegedHelper
         SWIFT_VERSION: 5.0
+        ARCHS: arm64
         CODE_SIGNING_ALLOWED: YES
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: "Developer ID Application: Fazheng Li (SWKH4B9DH8)"
@@ -82,6 +91,9 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: iOS/App.entitlements
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: SWKH4B9DH8
+        ARCHS: arm64
   OpenConnectPacketTunnel:
     type: app-extension
     platform: iOS
@@ -93,7 +105,16 @@ targets:
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
     sources:
       - path: iOS/Tunnel
+        excludes: [Info.plist]
       - path: Sources/Profile.swift
+      - path: Sources/KeychainStore.swift
+    dependencies:
+      - framework: Vendor/OpenConnect/OpenConnect.xcframework
+        embed: false
+      - sdk: libxml2.tbd
+      - sdk: libz.tbd
+      - sdk: libiconv.tbd
+      - sdk: Security.framework
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: xyz.nows.openconnect.tunnel
@@ -102,3 +123,8 @@ targets:
         CURRENT_PROJECT_VERSION: 1
         SWIFT_VERSION: 5.0
         CODE_SIGN_ENTITLEMENTS: iOS/Tunnel.entitlements
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: SWKH4B9DH8
+        ARCHS: arm64
+        SWIFT_OBJC_BRIDGING_HEADER: iOS/Tunnel/Tunnel-Bridging-Header.h
+        HEADER_SEARCH_PATHS: $(SRCROOT)/Vendor/OpenConnect/OpenConnect.xcframework/ios-arm64/Headers

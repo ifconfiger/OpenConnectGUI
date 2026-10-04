@@ -31,6 +31,7 @@ final class MobileVPNModel: ObservableObject {
 
     private var manager: NETunnelProviderManager?
     private var statusObserver: NSObjectProtocol?
+    private var logTimer: Timer?
 
     init() {
         do { profiles = try MobileProfileStore.load() }
@@ -45,6 +46,15 @@ final class MobileVPNModel: ObservableObject {
 
     var selectedProfile: VPNProfile? { profiles.first { $0.id == selectedID } }
     var isConnected: Bool { status == .connected || status == .connecting || status == .reasserting }
+    var statusText: String {
+        switch status {
+        case .connected: "已连接"
+        case .connecting: "正在连接…"
+        case .reasserting: "正在重新连接…"
+        case .disconnecting: "正在断开…"
+        default: "未连接"
+        }
+    }
     var canSave: Bool {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !server.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
@@ -105,6 +115,7 @@ final class MobileVPNModel: ObservableObject {
             message = "请填写并保存 VPN 密码。"
             return
         }
+        message = nil
         busy = true
         Task {
             defer { busy = false }
@@ -117,14 +128,16 @@ final class MobileVPNModel: ObservableObject {
                 manager.protocolConfiguration = configuration
                 manager.localizedDescription = profile.name
                 manager.isEnabled = true
-                // On-demand starts do not carry startVPNTunnel(options:). Keep
-                // this disabled until the extension can read credentials from
-                // a shared Keychain access group.
-                manager.onDemandRules = []
-                manager.isOnDemandEnabled = false
+                // With auto-reconnect the system restarts the tunnel whenever it
+                // drops; the extension reads the password from the shared keychain.
+                let rule = NEOnDemandRuleConnect()
+                rule.interfaceTypeMatch = .any
+                manager.onDemandRules = [rule]
+                manager.isOnDemandEnabled = profile.autoReconnect
                 try await save(manager)
                 try await load(manager)
-                try manager.connection.startVPNTunnel(options: ["password": password as NSString])
+                try manager.connection.startVPNTunnel(options: ["password": password as NSString,
+                                                                "manual": NSNumber(value: true)])
                 status = manager.connection.status
                 log = "正在连接 \(profile.server)…"
             } catch {
@@ -165,12 +178,47 @@ final class MobileVPNModel: ObservableObject {
             statusObserver = NotificationCenter.default.addObserver(forName: .NEVPNStatusDidChange,
                                                                      object: manager.connection,
                                                                      queue: .main) { [weak self] _ in
-                Task { @MainActor in
-                    guard let self, let manager = self.manager else { return }
-                    self.status = manager.connection.status
-                }
+                Task { @MainActor in self?.statusDidChange() }
             }
+            statusDidChange()
         } catch { message = error.localizedDescription }
+    }
+
+    private func statusDidChange() {
+        guard let manager else { return }
+        let previous = status
+        status = manager.connection.status
+        if status == .disconnected || status == .invalid {
+            logTimer?.invalidate()
+            logTimer = nil
+            if previous != .disconnected && previous != .invalid { showDisconnectError(manager) }
+        } else if logTimer == nil {
+            refreshLog()
+            logTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+                Task { @MainActor in self?.refreshLog() }
+            }
+        }
+    }
+
+    private func refreshLog() {
+        guard let session = manager?.connection as? NETunnelProviderSession else { return }
+        try? session.sendProviderMessage(Data("log".utf8)) { [weak self] data in
+            guard let data, !data.isEmpty else { return }
+            let text = String(decoding: data, as: UTF8.self)
+            Task { @MainActor in self?.log = text }
+        }
+    }
+
+    private func showDisconnectError(_ manager: NETunnelProviderManager) {
+        manager.connection.fetchLastDisconnectError { [weak self] error in
+            guard let error else { return }
+            let message = (error as NSError).userInfo[NSUnderlyingErrorKey].flatMap { ($0 as? Error)?.localizedDescription }
+                ?? error.localizedDescription
+            Task { @MainActor in
+                self?.message = message
+                self?.log += (self?.log.isEmpty == false ? "\n" : "") + "连接已结束：\(message)"
+            }
+        }
     }
 
     private func currentManager() async throws -> NETunnelProviderManager {
@@ -217,9 +265,9 @@ private struct MobileContentView: View {
                 }
 
                 HStack {
-                    Label(model.isConnected ? "已连接" : "未连接",
-                          systemImage: model.isConnected ? "checkmark.shield.fill" : "network")
-                        .foregroundStyle(model.isConnected ? .green : .secondary)
+                    Label(model.statusText,
+                          systemImage: model.status == .connected ? "checkmark.shield.fill" : "network")
+                        .foregroundStyle(model.status == .connected ? .green : .secondary)
                     Spacer()
                     Button(model.isConnected ? "断开连接" : "连接") {
                         if model.isConnected { model.disconnect() } else { model.connect() }
