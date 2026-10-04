@@ -159,7 +159,7 @@ final class OpenConnectTunnel {
             if ocs_session_auth_failed(newSession) != 0 {
                 return .authenticationFailed("VPN 认证失败：保存的账号或密码无效，或服务器要求二次验证。请在 App 中更新后重新连接。")
             }
-            return .failed("无法连接 VPN 服务器（\(errorText(connectResult))）。")
+            return .failed("无法连接 VPN 服务器：\(log.lastError ?? errorText(connectResult))")
         }
 
         let vpninfo = ocs_session_vpninfo(newSession)
@@ -234,11 +234,24 @@ final class OpenConnectTunnel {
         condition.unlock()
 
         if !established {
-            completeStart(error ?? TunnelError.connection("连接已取消。"))
+            completeStart(transferable(error ?? TunnelError.connection("连接已取消。")))
         } else if !wasStopping {
-            provider?.cancelTunnelWithError(error)
+            provider?.cancelTunnelWithError(error.map(transferable))
         }
         completions.forEach { $0() }
+    }
+
+    /// Errors reach the app through the system, which only keeps NSError
+    /// domain, code and userInfo; a Swift enum would lose its message.
+    private func transferable(_ error: Error) -> NSError {
+        let code: Int
+        switch error as? TunnelError {
+        case .authentication: code = 10
+        case .connection: code = 11
+        case nil: return error as NSError
+        }
+        return NSError(domain: "xyz.nows.openconnect.tunnel", code: code,
+                       userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
     }
 
     private func completeStart(_ error: Error?) {

@@ -84,7 +84,8 @@ static int validate_peer_cert_cb(void *privdata, const char *reason)
     }
     openconnect_free_peer_cert_chain(session->vpninfo, chain);
 
-    const char *host = openconnect_get_hostname(session->vpninfo);
+    /* get_hostname() returns the resolved address once connected. */
+    const char *host = openconnect_get_dnsname(session->vpninfo);
     CFStringRef hostname = host ? CFStringCreateWithCString(NULL, host, kCFStringEncodingUTF8) : NULL;
     SecPolicyRef policy = SecPolicyCreateSSL(true, hostname);
     SecTrustRef trust = NULL;
@@ -278,8 +279,13 @@ int ocs_session_connect(ocs_session *session, const char *server)
     if (ret)
         return ret;
     ret = openconnect_obtain_cookie(session->vpninfo);
-    if (ret)
+    if (ret) {
+        /* Gateways such as ocserv answer a wrong password with HTTP 401
+         * instead of another password form. */
+        if (session->password_used)
+            session->auth_failed = 1;
         return ret > 0 ? -ECANCELED : ret;
+    }
     return openconnect_make_cstp_connection(session->vpninfo);
 }
 
