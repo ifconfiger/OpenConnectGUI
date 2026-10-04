@@ -1,0 +1,753 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		190EFB305ACAF430CFEF7796 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
+		213E60969BEABFE4795B3C55 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A707CC63006F349D53F08B /* PacketTunnelProvider.swift */; };
+		2375679F8E9311FBD7CD20B0 /* OpenConnectController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0D1C043B4E411B44A587E9 /* OpenConnectController.swift */; };
+		23AC3EC1B2546E6749300214 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 771060E11B654DBA4E1AC53B /* KeychainStore.swift */; };
+		353C29EC743041267BAF6C08 /* HelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06CF42CB6A543D5340D4A866 /* HelperProtocol.swift */; };
+		433596E9B43D20870B739C3F /* HelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06CF42CB6A543D5340D4A866 /* HelperProtocol.swift */; };
+		478FE3F6CA91361B3EC7E6CC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A50EE8B17684AE3B688FC1C /* main.swift */; };
+		512A6C7DE555D3846527B5B8 /* PacketFlowBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256C071D7DC8F55898F31A3F /* PacketFlowBridge.swift */; };
+		576BF855EC1E20F0204812A6 /* OpenConnectPacketTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B67BBA81ACB9FB5D7E493F9E /* OpenConnectPacketTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		6C736A25265505BE3BC13952 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF7909757632D23F9816AD2 /* AppModel.swift */; };
+		7401D9ECD473B88DFDA060A0 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
+		82BECB28150420FC30D7B4FD /* MobileProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9787F4DACAC945539655F7B8 /* MobileProfileStore.swift */; };
+		889BF614BF02FDB1F925094D /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
+		92C8B38D554972CC47157C3D /* NetworkPathObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08F4338C09F6C57EE7461F9E /* NetworkPathObserver.swift */; };
+		9CA766059FB7B8CB68F4B5FD /* OpenConnectGUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1365DF5B210A3BFC7444A29 /* OpenConnectGUIApp.swift */; };
+		A473D231A7FA141126FBCDCE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89D3C34D9DE620E4F88D9910 /* Assets.xcassets */; };
+		D6B2C5BB10CF0AE620387891 /* vpnc-wrapper.sh in Resources */ = {isa = PBXBuildFile; fileRef = E345363780A0B5EDC2E0872F /* vpnc-wrapper.sh */; };
+		DFCB79812B388EFD18CE558B /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 959373107C77E2944FE8165C /* ProfileStore.swift */; };
+		E93C56A6654FB5572ECCE6B3 /* PrivilegedCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C64E5B19CA3FDC7D87BA6FA /* PrivilegedCommand.swift */; };
+		EB3B7598D5CDAB3368D4C708 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 771060E11B654DBA4E1AC53B /* KeychainStore.swift */; };
+		F79BF48D98278DF457AC22E9 /* OpenConnectMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B00F355CDA87714228CA /* OpenConnectMobileApp.swift */; };
+		F80144B0065165BB913B2CE2 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
+		FCEC46B48FC2D89C1E7C475A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CBFC0625B37175B4FA04072 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8B60B40095F4130EFE000B95 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2BB87B63019DAE4E58025FC1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DB827C2A2268E159D6D8D2B2;
+			remoteInfo = OpenConnectPrivilegedHelper;
+		};
+		8BC283C87E7DC99BF82A72A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2BB87B63019DAE4E58025FC1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E2CEC0B8FE4C88FC103E0D2E;
+			remoteInfo = OpenConnectPacketTunnel;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		56AEF36C4739186091D4D2E6 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				576BF855EC1E20F0204812A6 /* OpenConnectPacketTunnel.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		06CF42CB6A543D5340D4A866 /* HelperProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperProtocol.swift; sourceTree = "<group>"; };
+		08F4338C09F6C57EE7461F9E /* NetworkPathObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPathObserver.swift; sourceTree = "<group>"; };
+		20AE82F716F3718721AACB74 /* OpenConnectPrivilegedHelper */ = {isa = PBXFileReference; includeInIndex = 0; path = OpenConnectPrivilegedHelper; sourceTree = BUILT_PRODUCTS_DIR; };
+		256C071D7DC8F55898F31A3F /* PacketFlowBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketFlowBridge.swift; sourceTree = "<group>"; };
+		2CBFC0625B37175B4FA04072 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3C64E5B19CA3FDC7D87BA6FA /* PrivilegedCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedCommand.swift; sourceTree = "<group>"; };
+		5EF7909757632D23F9816AD2 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		771060E11B654DBA4E1AC53B /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		82B659AEA68005F8722ABD07 /* OpenConnectGUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenConnectGUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8338B00F355CDA87714228CA /* OpenConnectMobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectMobileApp.swift; sourceTree = "<group>"; };
+		89D3C34D9DE620E4F88D9910 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8A50EE8B17684AE3B688FC1C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		8A9E513836DD77546AF275DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		959373107C77E2944FE8165C /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
+		9787F4DACAC945539655F7B8 /* MobileProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileProfileStore.swift; sourceTree = "<group>"; };
+		9CDBE2B92725AD4649F7B815 /* OpenConnectiOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OpenConnectiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1A707CC63006F349D53F08B /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
+		B67BBA81ACB9FB5D7E493F9E /* OpenConnectPacketTunnel.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = OpenConnectPacketTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1365DF5B210A3BFC7444A29 /* OpenConnectGUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectGUIApp.swift; sourceTree = "<group>"; };
+		DA0D1C043B4E411B44A587E9 /* OpenConnectController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectController.swift; sourceTree = "<group>"; };
+		DE4FF96F129C9955E8E7DAAB /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
+		E345363780A0B5EDC2E0872F /* vpnc-wrapper.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "vpnc-wrapper.sh"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		15BDFDB1B0E86E8CD358031C /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				5EF7909757632D23F9816AD2 /* AppModel.swift */,
+				06CF42CB6A543D5340D4A866 /* HelperProtocol.swift */,
+				771060E11B654DBA4E1AC53B /* KeychainStore.swift */,
+				08F4338C09F6C57EE7461F9E /* NetworkPathObserver.swift */,
+				DA0D1C043B4E411B44A587E9 /* OpenConnectController.swift */,
+				C1365DF5B210A3BFC7444A29 /* OpenConnectGUIApp.swift */,
+				3C64E5B19CA3FDC7D87BA6FA /* PrivilegedCommand.swift */,
+				DE4FF96F129C9955E8E7DAAB /* Profile.swift */,
+				959373107C77E2944FE8165C /* ProfileStore.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		2A7673BE8FEB30C9F2EFF25E /* Tunnel */ = {
+			isa = PBXGroup;
+			children = (
+				8A9E513836DD77546AF275DC /* Info.plist */,
+				256C071D7DC8F55898F31A3F /* PacketFlowBridge.swift */,
+				B1A707CC63006F349D53F08B /* PacketTunnelProvider.swift */,
+			);
+			name = Tunnel;
+			path = iOS/Tunnel;
+			sourceTree = "<group>";
+		};
+		41951F88611E39ED09234D51 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				9787F4DACAC945539655F7B8 /* MobileProfileStore.swift */,
+				8338B00F355CDA87714228CA /* OpenConnectMobileApp.swift */,
+			);
+			name = App;
+			path = iOS/App;
+			sourceTree = "<group>";
+		};
+		7E5FAC39DF85C1086C474172 = {
+			isa = PBXGroup;
+			children = (
+				41951F88611E39ED09234D51 /* App */,
+				D1371AAA890CF8B901912570 /* Helper */,
+				99A0D39FEB990AF8E857C463 /* iOS */,
+				AD79DE8DD2DD7A3034516D01 /* Resources */,
+				15BDFDB1B0E86E8CD358031C /* Sources */,
+				2A7673BE8FEB30C9F2EFF25E /* Tunnel */,
+				8FF6F5CC22DF68066D1FDED7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8FF6F5CC22DF68066D1FDED7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				82B659AEA68005F8722ABD07 /* OpenConnectGUI.app */,
+				9CDBE2B92725AD4649F7B815 /* OpenConnectiOS.app */,
+				B67BBA81ACB9FB5D7E493F9E /* OpenConnectPacketTunnel.appex */,
+				20AE82F716F3718721AACB74 /* OpenConnectPrivilegedHelper */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		99A0D39FEB990AF8E857C463 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				89D3C34D9DE620E4F88D9910 /* Assets.xcassets */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		AD79DE8DD2DD7A3034516D01 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2CBFC0625B37175B4FA04072 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D1371AAA890CF8B901912570 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				8A50EE8B17684AE3B688FC1C /* main.swift */,
+				E345363780A0B5EDC2E0872F /* vpnc-wrapper.sh */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		20002E9F36A7778B4AA485DA /* OpenConnectGUI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F844F58D9CEC668D17BC9F98 /* Build configuration list for PBXNativeTarget "OpenConnectGUI" */;
+			buildPhases = (
+				7CD1485055A820FB4B186641 /* Sources */,
+				5D0157285A870FEDF3E078F6 /* Resources */,
+				B361A7694C3498E8392C1687 /* Embed privileged helper */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				63170EAB27E60E5CE5B01798 /* PBXTargetDependency */,
+			);
+			name = OpenConnectGUI;
+			packageProductDependencies = (
+			);
+			productName = OpenConnectGUI;
+			productReference = 82B659AEA68005F8722ABD07 /* OpenConnectGUI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		42C752989CBAA7D705831C39 /* OpenConnectiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC51FFE30D6F61B3F5A98E56 /* Build configuration list for PBXNativeTarget "OpenConnectiOS" */;
+			buildPhases = (
+				28F2D1D5A5DF3E891D5F94CB /* Sources */,
+				9A6FEF1FD45C19AC9BBC0A75 /* Resources */,
+				56AEF36C4739186091D4D2E6 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FB3FA2CFA06098AC5CAD9844 /* PBXTargetDependency */,
+			);
+			name = OpenConnectiOS;
+			packageProductDependencies = (
+			);
+			productName = OpenConnectiOS;
+			productReference = 9CDBE2B92725AD4649F7B815 /* OpenConnectiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DB827C2A2268E159D6D8D2B2 /* OpenConnectPrivilegedHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F0DB848A106207B1E6D77B83 /* Build configuration list for PBXNativeTarget "OpenConnectPrivilegedHelper" */;
+			buildPhases = (
+				7EFF154511AC8CEE98B13F80 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenConnectPrivilegedHelper;
+			packageProductDependencies = (
+			);
+			productName = OpenConnectPrivilegedHelper;
+			productReference = 20AE82F716F3718721AACB74 /* OpenConnectPrivilegedHelper */;
+			productType = "com.apple.product-type.tool";
+		};
+		E2CEC0B8FE4C88FC103E0D2E /* OpenConnectPacketTunnel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E93AEACDA688AB2047D2999 /* Build configuration list for PBXNativeTarget "OpenConnectPacketTunnel" */;
+			buildPhases = (
+				2BB3287E8E1C712C8CCB9784 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenConnectPacketTunnel;
+			packageProductDependencies = (
+			);
+			productName = OpenConnectPacketTunnel;
+			productReference = B67BBA81ACB9FB5D7E493F9E /* OpenConnectPacketTunnel.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2BB87B63019DAE4E58025FC1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					20002E9F36A7778B4AA485DA = {
+						DevelopmentTeam = SWKH4B9DH8;
+						ProvisioningStyle = Manual;
+					};
+					DB827C2A2268E159D6D8D2B2 = {
+						DevelopmentTeam = SWKH4B9DH8;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 78CA34E121D19448CE649FC7 /* Build configuration list for PBXProject "OpenConnectGUI" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7E5FAC39DF85C1086C474172;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8FF6F5CC22DF68066D1FDED7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				20002E9F36A7778B4AA485DA /* OpenConnectGUI */,
+				DB827C2A2268E159D6D8D2B2 /* OpenConnectPrivilegedHelper */,
+				42C752989CBAA7D705831C39 /* OpenConnectiOS */,
+				E2CEC0B8FE4C88FC103E0D2E /* OpenConnectPacketTunnel */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5D0157285A870FEDF3E078F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FCEC46B48FC2D89C1E7C475A /* Assets.xcassets in Resources */,
+				D6B2C5BB10CF0AE620387891 /* vpnc-wrapper.sh in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9A6FEF1FD45C19AC9BBC0A75 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A473D231A7FA141126FBCDCE /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B361A7694C3498E8392C1687 /* Embed privileged helper */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed privileged helper";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nmkdir -p \"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons\"\ncp \"$BUILT_PRODUCTS_DIR/OpenConnectPrivilegedHelper\" \"$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper\"\ncp \"$SRCROOT/Helper/xyz.nows.openconnect.privileged.plist\" \"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons/\"\nchmod 755 \"$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/vpnc-wrapper.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		28F2D1D5A5DF3E891D5F94CB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23AC3EC1B2546E6749300214 /* KeychainStore.swift in Sources */,
+				82BECB28150420FC30D7B4FD /* MobileProfileStore.swift in Sources */,
+				F79BF48D98278DF457AC22E9 /* OpenConnectMobileApp.swift in Sources */,
+				889BF614BF02FDB1F925094D /* Profile.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2BB3287E8E1C712C8CCB9784 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				512A6C7DE555D3846527B5B8 /* PacketFlowBridge.swift in Sources */,
+				213E60969BEABFE4795B3C55 /* PacketTunnelProvider.swift in Sources */,
+				7401D9ECD473B88DFDA060A0 /* Profile.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CD1485055A820FB4B186641 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6C736A25265505BE3BC13952 /* AppModel.swift in Sources */,
+				353C29EC743041267BAF6C08 /* HelperProtocol.swift in Sources */,
+				EB3B7598D5CDAB3368D4C708 /* KeychainStore.swift in Sources */,
+				92C8B38D554972CC47157C3D /* NetworkPathObserver.swift in Sources */,
+				2375679F8E9311FBD7CD20B0 /* OpenConnectController.swift in Sources */,
+				9CA766059FB7B8CB68F4B5FD /* OpenConnectGUIApp.swift in Sources */,
+				E93C56A6654FB5572ECCE6B3 /* PrivilegedCommand.swift in Sources */,
+				190EFB305ACAF430CFEF7796 /* Profile.swift in Sources */,
+				DFCB79812B388EFD18CE558B /* ProfileStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EFF154511AC8CEE98B13F80 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				433596E9B43D20870B739C3F /* HelperProtocol.swift in Sources */,
+				F80144B0065165BB913B2CE2 /* Profile.swift in Sources */,
+				478FE3F6CA91361B3EC7E6CC /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		63170EAB27E60E5CE5B01798 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DB827C2A2268E159D6D8D2B2 /* OpenConnectPrivilegedHelper */;
+			targetProxy = 8B60B40095F4130EFE000B95 /* PBXContainerItemProxy */;
+		};
+		FB3FA2CFA06098AC5CAD9844 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E2CEC0B8FE4C88FC103E0D2E /* OpenConnectPacketTunnel */;
+			targetProxy = 8BC283C87E7DC99BF82A72A2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0119AAB0A203DF259954C882 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iOS/App.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OpenConnect;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect;
+				PRODUCT_NAME = OpenConnect;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		06EAE0946FB070DC490AC0FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Fazheng Li (SWKH4B9DH8)";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = SWKH4B9DH8;
+				ENABLE_HARDENED_RUNTIME = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect.privileged;
+				PRODUCT_NAME = OpenConnectPrivilegedHelper;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		18BCE46F2111080EF931F509 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Fazheng Li (SWKH4B9DH8)";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = SWKH4B9DH8;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "OpenConnect GUI";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect;
+				PRODUCT_NAME = OpenConnectGUI;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		69D96CAF597BE354C70106DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		7668D3E97A1AA536751E13A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		823FAAB8780C7395B1424767 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = iOS/Tunnel.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = iOS/Tunnel/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect.tunnel;
+				PRODUCT_NAME = OpenConnectPacketTunnel;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8F53FC36426E32B537574FD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = iOS/Tunnel.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = iOS/Tunnel/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect.tunnel;
+				PRODUCT_NAME = OpenConnectPacketTunnel;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		94C081BC432C65680ED8B94F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iOS/App.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OpenConnect;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect;
+				PRODUCT_NAME = OpenConnect;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AEE20E2FC26EFD17B8CBA35C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Fazheng Li (SWKH4B9DH8)";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = SWKH4B9DH8;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "OpenConnect GUI";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect;
+				PRODUCT_NAME = OpenConnectGUI;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		ED51D3D353AD84E2868B22B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Fazheng Li (SWKH4B9DH8)";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = SWKH4B9DH8;
+				ENABLE_HARDENED_RUNTIME = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.nows.openconnect.privileged;
+				PRODUCT_NAME = OpenConnectPrivilegedHelper;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4E93AEACDA688AB2047D2999 /* Build configuration list for PBXNativeTarget "OpenConnectPacketTunnel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F53FC36426E32B537574FD7 /* Debug */,
+				823FAAB8780C7395B1424767 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		78CA34E121D19448CE649FC7 /* Build configuration list for PBXProject "OpenConnectGUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7668D3E97A1AA536751E13A0 /* Debug */,
+				69D96CAF597BE354C70106DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EC51FFE30D6F61B3F5A98E56 /* Build configuration list for PBXNativeTarget "OpenConnectiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0119AAB0A203DF259954C882 /* Debug */,
+				94C081BC432C65680ED8B94F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F0DB848A106207B1E6D77B83 /* Build configuration list for PBXNativeTarget "OpenConnectPrivilegedHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				06EAE0946FB070DC490AC0FB /* Debug */,
+				ED51D3D353AD84E2868B22B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F844F58D9CEC668D17BC9F98 /* Build configuration list for PBXNativeTarget "OpenConnectGUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				18BCE46F2111080EF931F509 /* Debug */,
+				AEE20E2FC26EFD17B8CBA35C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2BB87B63019DAE4E58025FC1 /* Project object */;
+}

@@ -1,0 +1,104 @@
+name: OpenConnectGUI
+options:
+  bundleIdPrefix: xyz.nows
+  deploymentTarget:
+    macOS: "13.0"
+    iOS: "16.0"
+targets:
+  OpenConnectGUI:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+      - path: Resources/Assets.xcassets
+      - path: Helper/vpnc-wrapper.sh
+        buildPhase: resources
+    dependencies:
+      - target: OpenConnectPrivilegedHelper
+        embed: false
+    postBuildScripts:
+      - name: Embed privileged helper
+        script: |
+          set -eu
+          mkdir -p "$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons"
+          cp "$BUILT_PRODUCTS_DIR/OpenConnectPrivilegedHelper" "$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper"
+          cp "$SRCROOT/Helper/xyz.nows.openconnect.privileged.plist" "$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons/"
+          chmod 755 "$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/OpenConnectPrivilegedHelper" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/vpnc-wrapper.sh"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: xyz.nows.openconnect
+        PRODUCT_NAME: OpenConnectGUI
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SWIFT_VERSION: 5.0
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: OpenConnect GUI
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        CODE_SIGNING_ALLOWED: YES
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Developer ID Application: Fazheng Li (SWKH4B9DH8)"
+        DEVELOPMENT_TEAM: SWKH4B9DH8
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+        ENABLE_HARDENED_RUNTIME: YES
+  OpenConnectPrivilegedHelper:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Helper/main.swift
+      - path: Sources/HelperProtocol.swift
+      - path: Sources/Profile.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: xyz.nows.openconnect.privileged
+        PRODUCT_NAME: OpenConnectPrivilegedHelper
+        SWIFT_VERSION: 5.0
+        CODE_SIGNING_ALLOWED: YES
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Developer ID Application: Fazheng Li (SWKH4B9DH8)"
+        DEVELOPMENT_TEAM: SWKH4B9DH8
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+        ENABLE_HARDENED_RUNTIME: YES
+  OpenConnectiOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: iOS/App
+      - path: Sources/Profile.swift
+      - path: Sources/KeychainStore.swift
+      - path: iOS/Assets.xcassets
+    dependencies:
+      - target: OpenConnectPacketTunnel
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: xyz.nows.openconnect
+        PRODUCT_NAME: OpenConnect
+        MARKETING_VERSION: 1.0
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: 5.0
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: OpenConnect
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_ENTITLEMENTS: iOS/App.entitlements
+  OpenConnectPacketTunnel:
+    type: app-extension
+    platform: iOS
+    info:
+      path: iOS/Tunnel/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
+    sources:
+      - path: iOS/Tunnel
+      - path: Sources/Profile.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: xyz.nows.openconnect.tunnel
+        PRODUCT_NAME: OpenConnectPacketTunnel
+        MARKETING_VERSION: 1.0
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: 5.0
+        CODE_SIGN_ENTITLEMENTS: iOS/Tunnel.entitlements
