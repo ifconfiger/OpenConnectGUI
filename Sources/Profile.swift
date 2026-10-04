@@ -9,6 +9,8 @@ struct VPNProfile: Codable, Identifiable, Equatable {
     var authGroup: String = ""
     var dnsMode: DNSMode = .remote
     var autoReconnect: Bool = true
+    /// Accept the server certificate even when it fails validation.
+    var ignoreCertificateErrors: Bool = false
 
     init(id: UUID = UUID(), name: String, server: String, username: String) {
         self.id = id
@@ -18,7 +20,7 @@ struct VPNProfile: Codable, Identifiable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, server, username, protocolName, authGroup, dnsMode, autoReconnect
+        case id, name, server, username, protocolName, authGroup, dnsMode, autoReconnect, ignoreCertificateErrors
     }
 
     init(from decoder: Decoder) throws {
@@ -31,6 +33,7 @@ struct VPNProfile: Codable, Identifiable, Equatable {
         authGroup = try values.decodeIfPresent(String.self, forKey: .authGroup) ?? ""
         dnsMode = try values.decodeIfPresent(DNSMode.self, forKey: .dnsMode) ?? .remote
         autoReconnect = try values.decodeIfPresent(Bool.self, forKey: .autoReconnect) ?? true
+        ignoreCertificateErrors = try values.decodeIfPresent(Bool.self, forKey: .ignoreCertificateErrors) ?? false
     }
 }
 

@@ -24,6 +24,7 @@ struct ocs_session {
     int authgroup_selected;
     int empty_forms;
     int auth_failed;
+    int ignore_certificate_errors;
 };
 
 static void session_log(ocs_session *session, int level, const char *fmt, ...)
@@ -67,6 +68,10 @@ static int validate_peer_cert_cb(void *privdata, const char *reason)
     struct oc_cert *chain = NULL;
     int count = openconnect_get_peer_cert_chain(session->vpninfo, &chain);
     if (count <= 0) {
+        if (session->ignore_certificate_errors) {
+            session_log(session, PRG_INFO, "已忽略证书错误：%s", reason);
+            return 0;
+        }
         session_log(session, PRG_ERR, "无法读取服务器证书链：%s", reason);
         return -EINVAL;
     }
@@ -100,7 +105,13 @@ static int validate_peer_cert_cb(void *privdata, const char *reason)
             char text[512] = "";
             if (description)
                 CFStringGetCString(description, text, sizeof(text), kCFStringEncodingUTF8);
-            session_log(session, PRG_ERR, "服务器证书不受信任：%s", text[0] ? text : reason);
+            if (session->ignore_certificate_errors) {
+                session_log(session, PRG_INFO, "已忽略证书错误：%s", text[0] ? text : reason);
+                result = 0;
+            } else {
+                session_log(session, PRG_ERR, "服务器证书不受信任：%s（可在账号设置中选择忽略证书错误）",
+                            text[0] ? text : reason);
+            }
             if (description)
                 CFRelease(description);
         }
@@ -112,7 +123,7 @@ static int validate_peer_cert_cb(void *privdata, const char *reason)
     if (hostname)
         CFRelease(hostname);
     CFRelease(certificates);
-    return result;
+    return session->ignore_certificate_errors ? 0 : result;
 }
 
 static int match_choice(struct oc_form_opt_select *select, const char *wanted)
@@ -216,8 +227,8 @@ static char *copy_string(const char *value)
 }
 
 ocs_session *ocs_session_new(const char *protocol, const char *username, const char *password,
-                             const char *authgroup, ocs_log_fn log, ocs_reconnected_fn reconnected,
-                             void *context)
+                             const char *authgroup, int ignore_certificate_errors, ocs_log_fn log,
+                             ocs_reconnected_fn reconnected, void *context)
 {
     static pthread_once_t ssl_once = PTHREAD_ONCE_INIT;
     pthread_once(&ssl_once, (void (*)(void))openconnect_init_ssl);
@@ -228,6 +239,7 @@ ocs_session *ocs_session_new(const char *protocol, const char *username, const c
     session->username = copy_string(username);
     session->password = copy_string(password);
     session->authgroup = copy_string(authgroup);
+    session->ignore_certificate_errors = ignore_certificate_errors;
     session->log = log;
     session->reconnected = reconnected;
     session->context = context;

@@ -1,6 +1,8 @@
 import Foundation
 import Security
 import Darwin
+import Network
+import CryptoKit
 
 private let serviceName = HelperService.name
 
@@ -79,6 +81,43 @@ private func bundledOpenConnect() -> String? {
     executableDirectory()?.appendingPathComponent("openconnect").path
 }
 
+/// SHA-1 of the certificate the server presents, in the form accepted by
+/// `openconnect --servercert`. Used when the profile ignores certificate errors.
+private func serverCertificateFingerprint(_ server: String) -> String? {
+    guard let components = URLComponents(string: server.hasPrefix("http") ? server : "https://" + server),
+          let host = components.host,
+          let port = NWEndpoint.Port(rawValue: UInt16(components.port ?? 443)) else { return nil }
+    let queue = DispatchQueue(label: "xyz.nows.openconnect.certificate")
+    let lock = NSLock()
+    var fingerprint: String?
+    let tls = NWProtocolTLS.Options()
+    sec_protocol_options_set_tls_server_name(tls.securityProtocolOptions, host)
+    sec_protocol_options_set_verify_block(tls.securityProtocolOptions, { _, trust, complete in
+        let secTrust = sec_trust_copy_ref(trust).takeRetainedValue()
+        if let leaf = (SecTrustCopyCertificateChain(secTrust) as? [SecCertificate])?.first {
+            let digest = Insecure.SHA1.hash(data: SecCertificateCopyData(leaf) as Data)
+            lock.lock()
+            fingerprint = digest.map { String(format: "%02x", $0) }.joined()
+            lock.unlock()
+        }
+        complete(true)
+    }, queue)
+    let connection = NWConnection(host: NWEndpoint.Host(host), port: port, using: NWParameters(tls: tls))
+    let finished = DispatchSemaphore(value: 0)
+    connection.stateUpdateHandler = { state in
+        switch state {
+        case .ready, .failed, .waiting, .cancelled: finished.signal()
+        default: break
+        }
+    }
+    connection.start(queue: queue)
+    _ = finished.wait(timeout: .now() + 15)
+    connection.cancel()
+    lock.lock()
+    defer { lock.unlock() }
+    return fingerprint
+}
+
 private final class HelperSession: NSObject, OpenConnectHelperProtocol {
     private let uid: uid_t
     init(uid: uid_t) { self.uid = uid }
@@ -134,6 +173,13 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
                     "--reconnect-timeout=\(profile.autoReconnect ? 15 : 0)", "--script=\(script)"]
         if profile.autoReconnect { args.append("--force-dpd=30") }
         if !profile.authGroup.isEmpty { args.append("--authgroup=\(profile.authGroup)") }
+        if profile.ignoreCertificateErrors {
+            guard let fingerprint = serverCertificateFingerprint(profile.server) else {
+                return (-1, "无法读取服务器证书。")
+            }
+            log.write(Data("已忽略证书错误，信任服务器证书 SHA1 \(fingerprint)\n".utf8))
+            args.append("--servercert=\(fingerprint)")
+        }
         args.append(profile.server)
         let task = Process()
         task.executableURL = URL(fileURLWithPath: binary)

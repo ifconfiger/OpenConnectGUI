@@ -125,7 +125,8 @@ final class OpenConnectTunnel {
     private func connectOnce(established: inout Bool) -> Outcome {
         let context = Unmanaged.passUnretained(self).toOpaque()
         guard let newSession = ocs_session_new(profile.protocolName, profile.username, password,
-                                               profile.authGroup, { context, level, message in
+                                               profile.authGroup, profile.ignoreCertificateErrors ? 1 : 0,
+                                               { context, level, message in
             guard let context, let message else { return }
             let tunnel = Unmanaged<OpenConnectTunnel>.fromOpaque(context).takeUnretainedValue()
             tunnel.log.append(String(cString: message), error: level == PRG_ERR)

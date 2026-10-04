@@ -13,6 +13,8 @@ final class AppModel: ObservableObject {
     @Published var authGroup = ""
     @Published var dnsMode: DNSMode = .remote
     @Published var autoReconnect = true
+    @Published var ignoreCertificateErrors = false
+    @Published var savedNotice = false
     @Published var busy = false
     @Published var connectedID: UUID?
     @Published private(set) var waitingForNetwork = false
@@ -67,6 +69,8 @@ final class AppModel: ObservableObject {
         authGroup = profile.authGroup
         dnsMode = profile.dnsMode
         autoReconnect = profile.autoReconnect
+        ignoreCertificateErrors = profile.ignoreCertificateErrors
+        savedNotice = false
         do { password = try KeychainStore.password(for: profile.id) ?? "" }
         catch { password = ""; errorMessage = error.localizedDescription }
         log = OpenConnectController.readLog(for: profile)
@@ -81,6 +85,7 @@ final class AppModel: ObservableObject {
         profiles[index].authGroup = authGroup.trimmingCharacters(in: .whitespacesAndNewlines)
         profiles[index].dnsMode = dnsMode
         profiles[index].autoReconnect = autoReconnect
+        profiles[index].ignoreCertificateErrors = ignoreCertificateErrors
         if !autoReconnect && supervisedID == id {
             supervisedID = nil
             nextReconnectAt = nil
@@ -91,8 +96,12 @@ final class AppModel: ObservableObject {
     }
 
     func saveTapped() {
-        do { try save() }
-        catch { errorMessage = error.localizedDescription }
+        do {
+            try save()
+            errorMessage = nil
+            savedNotice = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.savedNotice = false }
+        } catch { errorMessage = error.localizedDescription }
     }
 
     func delete() {

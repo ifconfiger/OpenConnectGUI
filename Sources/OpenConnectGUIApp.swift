@@ -196,6 +196,7 @@ private struct ContentView: View {
                     }
                 }
                 Toggle("断线自动重连", isOn: $model.autoReconnect)
+                Toggle("忽略证书错误（不安全）", isOn: $model.ignoreCertificateErrors)
                 TextField("认证组（可选）", text: $model.authGroup)
                 TextField("用户名", text: $model.username)
                 SecureField("密码", text: $model.password)
@@ -207,6 +208,10 @@ private struct ContentView: View {
                 Text("密码保存在本机钥匙串")
                     .font(.caption).foregroundStyle(.secondary)
                 Spacer()
+                if model.savedNotice {
+                    Label("已保存", systemImage: "checkmark.circle.fill")
+                        .font(.caption).foregroundStyle(.green)
+                }
                 Button("保存", action: model.saveTapped)
                     .disabled(!model.canSave || model.busy || model.isConnected)
             }

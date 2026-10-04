@@ -13,8 +13,8 @@ typedef void (*ocs_log_fn)(void *context, int level, const char *message);
 typedef void (*ocs_reconnected_fn)(void *context);
 
 ocs_session *ocs_session_new(const char *protocol, const char *username, const char *password,
-                             const char *authgroup, ocs_log_fn log, ocs_reconnected_fn reconnected,
-                             void *context);
+                             const char *authgroup, int ignore_certificate_errors, ocs_log_fn log,
+                             ocs_reconnected_fn reconnected, void *context);
 void ocs_session_free(ocs_session *session);
 struct openconnect_info *ocs_session_vpninfo(ocs_session *session);
 

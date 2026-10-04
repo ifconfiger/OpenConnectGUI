@@ -24,6 +24,8 @@ final class MobileVPNModel: ObservableObject {
     @Published var authGroup = ""
     @Published var dnsMode: DNSMode = .remote
     @Published var autoReconnect = true
+    @Published var ignoreCertificateErrors = false
+    @Published var notice: String?
     @Published var status: NEVPNStatus = .disconnected
     @Published var busy = false
     @Published var message: String?
@@ -32,6 +34,7 @@ final class MobileVPNModel: ObservableObject {
     private var manager: NETunnelProviderManager?
     private var statusObserver: NSObjectProtocol?
     private var logTimer: Timer?
+    private var noticeTask: Task<Void, Never>?
 
     init() {
         do { profiles = try MobileProfileStore.load() }
@@ -77,15 +80,26 @@ final class MobileVPNModel: ObservableObject {
         authGroup = profile.authGroup
         dnsMode = profile.dnsMode
         autoReconnect = profile.autoReconnect
+        ignoreCertificateErrors = profile.ignoreCertificateErrors
         do { password = try KeychainStore.password(for: profile.id) ?? "" }
         catch { password = ""; message = error.localizedDescription }
         log = ""
     }
 
-    func save() {
+    @discardableResult
+    func save() -> Bool {
+        guard canSave else {
+            message = "请填写名称、服务器和用户名。"
+            return false
+        }
         do {
-            guard canSave, let id = selectedID,
-                  let index = profiles.firstIndex(where: { $0.id == id }) else { return }
+            // Editing before any profile exists (first launch) creates one.
+            if selectedID == nil || !profiles.contains(where: { $0.id == selectedID }) {
+                let profile = VPNProfile(name: name, server: server, username: username)
+                profiles.append(profile)
+                selectedID = profile.id
+            }
+            guard let id = selectedID, let index = profiles.firstIndex(where: { $0.id == id }) else { return false }
             profiles[index].name = name.trimmingCharacters(in: .whitespacesAndNewlines)
             profiles[index].server = server.trimmingCharacters(in: .whitespacesAndNewlines)
             profiles[index].username = username.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -93,10 +107,27 @@ final class MobileVPNModel: ObservableObject {
             profiles[index].authGroup = authGroup.trimmingCharacters(in: .whitespacesAndNewlines)
             profiles[index].dnsMode = dnsMode
             profiles[index].autoReconnect = autoReconnect
+            profiles[index].ignoreCertificateErrors = ignoreCertificateErrors
             try KeychainStore.save(password, for: id)
             try MobileProfileStore.save(profiles)
-            message = "账号已保存。"
-        } catch { message = error.localizedDescription }
+            message = nil
+            show(notice: "已保存")
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
+    private func show(notice text: String) {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        notice = text
+        noticeTask?.cancel()
+        noticeTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            guard !Task.isCancelled else { return }
+            self?.notice = nil
+        }
     }
 
     func delete() {
@@ -110,7 +141,7 @@ final class MobileVPNModel: ObservableObject {
     }
 
     func connect() {
-        save()
+        guard save() else { return }
         guard let profile = selectedProfile, !password.isEmpty else {
             message = "请填写并保存 VPN 密码。"
             return
@@ -292,6 +323,18 @@ private struct MobileContentView: View {
 
                 if tab == 0 { account } else { log }
             }
+            .overlay(alignment: .bottom) {
+                if let notice = model.notice {
+                    Label(notice, systemImage: "checkmark.circle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 16).padding(.vertical, 10)
+                        .background(.green, in: Capsule())
+                        .padding(.bottom, 24)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.easeInOut(duration: 0.2), value: model.notice)
             .navigationTitle("OpenConnect")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -318,13 +361,27 @@ private struct MobileContentView: View {
                 ForEach(DNSMode.allCases) { item in Text(item.title).tag(item) }
             }
             Toggle("断线自动重连", isOn: $model.autoReconnect)
+            Toggle("忽略证书错误（不安全）", isOn: $model.ignoreCertificateErrors)
             TextField("认证组（可选）", text: $model.authGroup)
             TextField("用户名", text: $model.username)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
             SecureField("密码", text: $model.password)
-            Button("保存", action: model.save).disabled(!model.canSave || model.isConnected)
+            Section {
+                Button {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                                    to: nil, from: nil, for: nil)
+                    model.save()
+                } label: {
+                    Text("保存").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(model.isConnected)
+            } footer: {
+                Text("密码保存在钥匙串，VPN 扩展自动读取，无需每次输入。")
+            }
         }
+        .scrollDismissesKeyboard(.interactively)
         .disabled(model.busy)
     }
 
