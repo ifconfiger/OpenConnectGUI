@@ -78,4 +78,20 @@ VPNGATEWAY=::1 reason=attempt-reconnect "$fixture/wrapper.sh" "$fixture/upstream
 [ ! -e "$fixture/host-route" ]
 reason=attempt-reconnect "$fixture/wrapper.sh" "$fixture/upstream.sh" remote >/dev/null
 [ "$(cat "$fixture/host-route")" = 10.198.0.1 ]
+
+# A route through a gateway from a vanished network blocks the next connect entirely,
+# so the helper prunes it before OpenConnect dials, without running the script.
+printf '%s\n' 10.130.0.1 > "$fixture/host-route"
+printf '%s\n' 192.168.1.254 > "$fixture/current-gateway"
+rm -f "$fixture/state/openconnectgui-${VPNPID}.env"
+reason=openconnectgui-prune "$fixture/wrapper.sh" "$fixture/upstream.sh" remote >/dev/null
+[ ! -e "$fixture/host-route" ]
+[ ! -e "$fixture/state/openconnectgui-${VPNPID}.env" ]
+
+# A route through the gateway still in use is left alone.
+printf '%s\n' 192.168.1.254 > "$fixture/host-route"
+reason=openconnectgui-prune "$fixture/wrapper.sh" "$fixture/upstream.sh" remote >/dev/null
+[ "$(cat "$fixture/host-route")" = 192.168.1.254 ]
+rm "$fixture/host-route"
+
 printf 'route regression test passed\n'

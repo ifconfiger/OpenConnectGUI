@@ -26,6 +26,18 @@ stale_gateway_route() {
   [ -n "$current_gateway" ] && [ "$route_gateway" != "$current_gateway" ]
 }
 
+# OpenConnect only runs a script once the tunnel is up, so a route left behind by an
+# earlier session blocks the very connection that would clean it up: its gateway is
+# gone and connect() to the VPN server fails with EADDRNOTAVAIL. The helper asks for
+# this pass before it dials.
+if [ "$reason" = openconnectgui-prune ]; then
+  if stale_gateway_route; then
+    route -n delete -host "$VPNGATEWAY" || exit $?
+    echo "已清理残留路由 $VPNGATEWAY（网关 $route_gateway 已不可达）"
+  fi
+  exit 0
+fi
+
 case "$reason" in
   connect|reconnect)
     /bin/mkdir -p /var/run/vpnc

@@ -119,6 +119,47 @@ private func serverCertificateFingerprint(_ server: String) -> String? {
     return fingerprint
 }
 
+/// Addresses OpenConnect may dial for `host`.
+private func resolvedIPv4Addresses(_ host: String) -> [String] {
+    var hints = addrinfo()
+    hints.ai_family = AF_INET
+    hints.ai_socktype = SOCK_STREAM
+    var list: UnsafeMutablePointer<addrinfo>?
+    guard getaddrinfo(host, nil, &hints, &list) == 0, let first = list else { return [] }
+    defer { freeaddrinfo(first) }
+    var addresses: [String] = []
+    var node: UnsafeMutablePointer<addrinfo>? = first
+    while let current = node {
+        if current.pointee.ai_family == AF_INET, let address = current.pointee.ai_addr {
+            var text = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
+            address.withMemoryRebound(to: sockaddr_in.self, capacity: 1) {
+                var raw = $0.pointee.sin_addr
+                _ = inet_ntop(AF_INET, &raw, &text, socklen_t(text.count))
+            }
+            let value = String(cString: text)
+            if !value.isEmpty, !addresses.contains(value) { addresses.append(value) }
+        }
+        node = current.pointee.ai_next
+    }
+    return addresses
+}
+
+/// A host route to the VPN server outlives its session when OpenConnect is killed or
+/// the network changes. Its gateway is then off-link, so connect() fails with
+/// EADDRNOTAVAIL before OpenConnect would run any script able to clean up.
+private func pruneStaleServerRoutes(_ profile: VPNProfile, wrapper: String, script: String, log: FileHandle) {
+    let server = profile.server
+    guard let components = URLComponents(string: server.hasPrefix("http") ? server : "https://" + server),
+          let host = components.host else { return }
+    for address in resolvedIPv4Addresses(host) {
+        let result = run(wrapper, [script, profile.dnsMode.rawValue],
+                         environment: ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+                                       "reason": "openconnectgui-prune", "VPNGATEWAY": address])
+        let message = result.1.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !message.isEmpty { log.write(Data((message + "\n").utf8)) }
+    }
+}
+
 private func recordedPIDs(_ paths: [String]) -> Set<pid_t> {
     Set(paths.compactMap { path in
         guard let text = try? String(contentsOfFile: path, encoding: .utf8),
@@ -222,6 +263,7 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
             return (-1, "连接日志权限不安全。")
         }
         let log = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        pruneStaleServerRoutes(profile, wrapper: wrapper, script: vpncScript, log: log)
         let script = shellQuote(wrapper) + " " + shellQuote(vpncScript) + " " + profile.dnsMode.rawValue
         var args = ["--background", "--non-inter", "--passwd-on-stdin", "--pid-file=\(pidFile)",
                     "--protocol=\(profile.protocolName)", "--user=\(profile.username)",
