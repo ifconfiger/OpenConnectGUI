@@ -29,6 +29,8 @@ macOS 连接默认强制直连，不读取系统代理；旧配置中的代理�
 
 服务器证书无效（自签名、过期、域名不符）时，可在账号中开启“忽略证书错误（不安全）”：macOS 版连接前读取服务器当前证书，并用 `--servercert` 固定信任它；iOS 版直接接受该证书。这会失去对中间人攻击的防护，只建议在内网自签名证书的场景使用。
 
+连接失败时，辅助服务会把 OpenConnect 日志翻译成可操作的提示再交给界面。密码被拒最需要翻译：OpenConnect 收到服务器的 401 后会补一句“requested Basic authentication which is disabled by default”，但那只是它启动时就对所有服务器禁用了 HTTP Basic（`library.c` 初始化 `AUTH_DEFAULT_DISABLED`），与服务器要求无关，ocserv 的 401 响应里并没有 `WWW-Authenticate` 头。照字面去查代理或协议会走错方向，界面因此直接显示“服务器拒绝了用户名或密码”。
+
 服务器需支持所选协议的用户名与密码登录。需要网页 SSO、客户端证书或交互式二次验证的网关，目前无法通过此界面完成登录。
 
 ## iPhone 与 iPad

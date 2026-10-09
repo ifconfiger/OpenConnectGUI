@@ -160,6 +160,33 @@ private func pruneStaleServerRoutes(_ profile: VPNProfile, wrapper: String, scri
     }
 }
 
+/// Turn the tail of an OpenConnect log into something the user can act on. A rejected
+/// password arrives as a bare 401 trailed by a note about HTTP Basic authentication
+/// being disabled, which OpenConnect reports for every server because it disables
+/// Basic at startup regardless of what the server offered; on its own that line sends
+/// people looking for a proxy or protocol problem they do not have.
+private func connectFailureReason(_ logPath: String) -> String? {
+    guard let handle = FileHandle(forReadingAtPath: logPath) else { return nil }
+    defer { try? handle.close() }
+    let size = (try? handle.seekToEnd()) ?? 0
+    try? handle.seek(toOffset: size > 16_384 ? size - 16_384 : 0)
+    guard let data = try? handle.readToEnd() else { return nil }
+    let tail = String(decoding: data, as: UTF8.self)
+    if tail.contains("401 Authentication failed") || tail.contains("Got HTTP response: HTTP/1.1 401") {
+        return "服务器拒绝了用户名或密码。请在账号设置中核对用户名并重新输入密码。"
+    }
+    if tail.contains("Can't assign requested address") {
+        return "无法连接服务器：本机有一条指向失效网关的主机路由。请重试一次；若仍失败，用 netstat -rn -f inet 查看指向服务器 IP 的 UGHS 路由。"
+    }
+    if tail.contains("failed verification") {
+        return "服务器证书校验失败。请核对服务器地址，或在账号设置中开启“忽略证书错误（不安全）”。"
+    }
+    if tail.contains("Failed to connect to host") || tail.contains("Failed to open HTTPS connection") {
+        return "无法连接服务器。请检查网络、服务器地址与端口。"
+    }
+    return nil
+}
+
 private func recordedPIDs(_ paths: [String]) -> Set<pid_t> {
     Set(paths.compactMap { path in
         guard let text = try? String(contentsOfFile: path, encoding: .utf8),
@@ -297,7 +324,9 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
             try input.fileHandleForWriting.write(contentsOf: Data((password + "\n").utf8))
             try input.fileHandleForWriting.close()
             task.waitUntilExit()
-            return (task.terminationStatus, task.terminationStatus == 0 ? "" : "OpenConnect 连接失败，请查看日志。")
+            if task.terminationStatus == 0 { return (0, "") }
+            return (task.terminationStatus,
+                    connectFailureReason(logPath) ?? "OpenConnect 连接失败，请查看日志。")
         } catch { return (-1, error.localizedDescription) }
     }
 
