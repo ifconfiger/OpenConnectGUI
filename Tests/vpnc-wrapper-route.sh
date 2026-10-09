@@ -48,7 +48,7 @@ cat > "$fixture/upstream.sh" <<'EOF'
 #!/bin/sh
 gateway=$(route -n get default | awk '$1 == "gateway:" { print $2; exit }')
 case "$reason" in
-  connect|reconnect) route add -host "$VPNGATEWAY" "$gateway" ;;
+  connect|reconnect|attempt-reconnect) route add -host "$VPNGATEWAY" "$gateway" ;;
   disconnect) route delete -host "$VPNGATEWAY" "$gateway" || : ;;
 esac
 EOF
@@ -70,5 +70,12 @@ reason=disconnect "$fixture/wrapper.sh" "$fixture/upstream.sh" remote >/dev/null
 [ ! -e "$fixture/state/openconnectgui-${VPNPID}.env" ]
 
 reason=connect "$fixture/wrapper.sh" "$fixture/upstream.sh" remote >/dev/null
+[ "$(cat "$fixture/host-route")" = 10.198.0.1 ]
+rm "$fixture/host-route"
+VPNGATEWAY=127.0.0.1 reason=attempt-reconnect "$fixture/wrapper.sh" "$fixture/upstream.sh" remote >/dev/null
+[ ! -e "$fixture/host-route" ]
+VPNGATEWAY=::1 reason=attempt-reconnect "$fixture/wrapper.sh" "$fixture/upstream.sh" remote >/dev/null
+[ ! -e "$fixture/host-route" ]
+reason=attempt-reconnect "$fixture/wrapper.sh" "$fixture/upstream.sh" remote >/dev/null
 [ "$(cat "$fixture/host-route")" = 10.198.0.1 ]
 printf 'route regression test passed\n'

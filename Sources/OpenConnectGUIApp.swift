@@ -185,6 +185,11 @@ private struct ContentView: View {
             Form {
                 TextField("名称", text: $model.name)
                 TextField("服务器", text: $model.server, prompt: Text("vpn.example.com"))
+                Toggle("使用 HTTP 代理", isOn: $model.proxyEnabled)
+                if model.proxyEnabled {
+                    TextField("HTTP 代理地址", text: $model.proxyURL,
+                              prompt: Text("http://127.0.0.1:7897"))
+                }
                 Picker("协议", selection: $model.protocolName) {
                     ForEach(VPNProtocol.allCases) { vpnProtocol in
                         Text(vpnProtocol.title).tag(vpnProtocol.rawValue)

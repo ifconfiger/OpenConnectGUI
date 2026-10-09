@@ -3,6 +3,7 @@ import Darwin
 
 enum VPNError: LocalizedError {
     case invalidServer
+    case invalidProxy
     case missingBinary
     case missingPassword
     case alreadyConnected
@@ -15,6 +16,7 @@ enum VPNError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidServer: "服务器地址无效，请填写主机名或 HTTPS 地址。"
+        case .invalidProxy: "HTTP 代理地址无效，请填写 http://主机:端口。"
         case .missingBinary: "App 内置的 OpenConnect 缺失，请重新安装应用。"
         case .missingPassword: "请填写并保存 VPN 密码。"
         case .alreadyConnected: "已有 VPN 连接正在运行。"
@@ -71,6 +73,7 @@ enum OpenConnectController {
         guard runningPID(for: profile) == nil else { throw VPNError.alreadyConnected }
         guard binary != nil else { throw VPNError.missingBinary }
         guard isValidServer(profile.server) else { throw VPNError.invalidServer }
+        guard profile.hasValidProxy else { throw VPNError.invalidProxy }
 
         let directory = sessionDirectory(for: profile)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true,

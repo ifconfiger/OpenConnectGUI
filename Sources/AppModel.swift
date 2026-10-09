@@ -13,6 +13,8 @@ final class AppModel: ObservableObject {
     @Published var authGroup = ""
     @Published var dnsMode: DNSMode = .remote
     @Published var autoReconnect = true
+    @Published var proxyEnabled = false
+    @Published var proxyURL = ""
     @Published var ignoreCertificateErrors = false
     @Published var savedNotice = false
     @Published var busy = false
@@ -69,6 +71,8 @@ final class AppModel: ObservableObject {
         authGroup = profile.authGroup
         dnsMode = profile.dnsMode
         autoReconnect = profile.autoReconnect
+        proxyEnabled = profile.proxyEnabled
+        proxyURL = profile.proxyEnabled ? profile.proxyURL : ""
         ignoreCertificateErrors = profile.ignoreCertificateErrors
         savedNotice = false
         do { password = try KeychainStore.password(for: profile.id) ?? "" }
@@ -78,6 +82,11 @@ final class AppModel: ObservableObject {
 
     func save() throws {
         guard canSave, let id = selectedID, let index = profiles.firstIndex(where: { $0.id == id }) else { return }
+        let normalizedProxy = proxyURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        var candidate = profiles[index]
+        candidate.proxyEnabled = proxyEnabled
+        candidate.proxyURL = normalizedProxy
+        guard candidate.hasValidProxy else { throw VPNError.invalidProxy }
         profiles[index].name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         profiles[index].server = server.trimmingCharacters(in: .whitespacesAndNewlines)
         profiles[index].username = username.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -85,6 +94,8 @@ final class AppModel: ObservableObject {
         profiles[index].authGroup = authGroup.trimmingCharacters(in: .whitespacesAndNewlines)
         profiles[index].dnsMode = dnsMode
         profiles[index].autoReconnect = autoReconnect
+        profiles[index].proxyEnabled = proxyEnabled
+        profiles[index].proxyURL = proxyEnabled ? normalizedProxy : ""
         profiles[index].ignoreCertificateErrors = ignoreCertificateErrors
         if !autoReconnect && supervisedID == id {
             supervisedID = nil
@@ -116,7 +127,7 @@ final class AppModel: ObservableObject {
             profiles.removeAll { $0.id == profile.id }
             try ProfileStore.save(profiles)
             selectedID = nil
-            name = ""; server = ""; username = ""; password = ""; authGroup = ""
+            name = ""; server = ""; username = ""; password = ""; authGroup = ""; proxyEnabled = false; proxyURL = ""
             select(profiles.first?.id)
         } catch { errorMessage = error.localizedDescription }
     }
@@ -178,6 +189,17 @@ final class AppModel: ObservableObject {
         let previous = connectedID
         let current = profiles.first { OpenConnectController.runningPID(for: $0) != nil }?.id
         connectedID = current
+        if let previous, current == nil, !busy,
+           let profile = profiles.first(where: { $0.id == previous }) {
+            busy = true
+            Task.detached {
+                let result = PrivilegedCommand.shared.cleanup(profile)
+                await MainActor.run {
+                    self.busy = false
+                    if result.status != 0 { self.errorMessage = "VPN 退出后清理失败：" + result.output }
+                }
+            }
+        }
         if let current {
             if supervisedID == nil, manualDisconnectID != current,
                profiles.first(where: { $0.id == current })?.autoReconnect == true {

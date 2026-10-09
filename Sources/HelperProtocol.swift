@@ -9,5 +9,6 @@ enum HelperService {
     func connect(_ profileData: Data, password: String,
                  reply: @escaping (Int32, String) -> Void)
     func disconnect(_ profileID: String, reply: @escaping (Int32, String) -> Void)
+    func cleanup(_ profileID: String, reply: @escaping (Int32, String) -> Void)
     func refreshNetwork(_ profileID: String, reply: @escaping (Int32, String) -> Void)
 }

@@ -4,6 +4,13 @@ script=$1
 dns_mode=$2
 state="/var/run/vpnc/openconnectgui-${VPNPID}.env"
 
+# The upstream script's attempt-reconnect path adds a physical-gateway route
+# even when VPNGATEWAY is the local HTTP proxy. In that case there is no
+# remote gateway route to repair.
+if [ "$reason" = attempt-reconnect ]; then
+  case "$VPNGATEWAY" in 127.*|::1) exit 0 ;; esac
+fi
+
 # vpnc-script removes the gateway host route using the *current* default gateway.
 # After a network switch that may differ from the gateway used at connect time,
 # leaving a static route to the VPN server through an unreachable old gateway.

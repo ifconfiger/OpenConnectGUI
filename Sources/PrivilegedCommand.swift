@@ -21,6 +21,10 @@ final class PrivilegedCommand {
         call { helper, reply in helper.disconnect(profile.id.uuidString, reply: reply) }
     }
 
+    func cleanup(_ profile: VPNProfile) -> (status: Int32, output: String) {
+        call { helper, reply in helper.cleanup(profile.id.uuidString, reply: reply) }
+    }
+
     func refreshNetwork(_ profile: VPNProfile) -> (status: Int32, output: String) {
         call { helper, reply in helper.refreshNetwork(profile.id.uuidString, reply: reply) }
     }

@@ -9,6 +9,8 @@ struct VPNProfile: Codable, Identifiable, Equatable {
     var authGroup: String = ""
     var dnsMode: DNSMode = .remote
     var autoReconnect: Bool = true
+    var proxyEnabled: Bool = false
+    var proxyURL: String = ""
     /// Accept the server certificate even when it fails validation.
     var ignoreCertificateErrors: Bool = false
 
@@ -20,7 +22,7 @@ struct VPNProfile: Codable, Identifiable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, server, username, protocolName, authGroup, dnsMode, autoReconnect, ignoreCertificateErrors
+        case id, name, server, username, protocolName, authGroup, dnsMode, autoReconnect, proxyEnabled, proxyURL, ignoreCertificateErrors
     }
 
     init(from decoder: Decoder) throws {
@@ -33,7 +35,21 @@ struct VPNProfile: Codable, Identifiable, Equatable {
         authGroup = try values.decodeIfPresent(String.self, forKey: .authGroup) ?? ""
         dnsMode = try values.decodeIfPresent(DNSMode.self, forKey: .dnsMode) ?? .remote
         autoReconnect = try values.decodeIfPresent(Bool.self, forKey: .autoReconnect) ?? true
+        proxyEnabled = try values.decodeIfPresent(Bool.self, forKey: .proxyEnabled) ?? false
+        proxyURL = try values.decodeIfPresent(String.self, forKey: .proxyURL) ?? ""
         ignoreCertificateErrors = try values.decodeIfPresent(Bool.self, forKey: .ignoreCertificateErrors) ?? false
+    }
+
+    var hasValidProxy: Bool {
+        if !proxyEnabled { return true }
+        if proxyURL.isEmpty { return false }
+        guard proxyURL.utf8.count < 2048,
+              let proxy = URLComponents(string: proxyURL),
+              proxy.scheme == "http", proxy.host != nil, proxy.port != nil,
+              proxy.user == nil, proxy.password == nil,
+              (proxy.path.isEmpty || proxy.path == "/"),
+              proxy.query == nil, proxy.fragment == nil else { return false }
+        return true
     }
 }
 

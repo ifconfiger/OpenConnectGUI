@@ -44,7 +44,8 @@ private func isValidProfile(_ profile: VPNProfile) -> Bool {
           !profile.username.isEmpty, !profile.username.hasPrefix("-"),
           !profile.username.contains(where: \.isNewline),
           !profile.authGroup.contains(where: \.isNewline),
-          profile.username.utf8.count < 1024, profile.authGroup.utf8.count < 1024 else { return false }
+          profile.username.utf8.count < 1024, profile.authGroup.utf8.count < 1024,
+          profile.hasValidProxy else { return false }
     return true
 }
 
@@ -118,6 +119,57 @@ private func serverCertificateFingerprint(_ server: String) -> String? {
     return fingerprint
 }
 
+private func recordedPIDs(_ paths: [String]) -> Set<pid_t> {
+    Set(paths.compactMap { path in
+        guard let text = try? String(contentsOfFile: path, encoding: .utf8),
+              let pid = pid_t(text.trimmingCharacters(in: .whitespacesAndNewlines)), pid > 1 else { return nil }
+        return pid
+    })
+}
+
+/// Finish route and DNS cleanup even when OpenConnect exited before receiving a stop request.
+private func cleanupSavedSessions(_ profileID: UUID, knownPIDs: Set<pid_t>) -> (found: Bool, error: String?) {
+    guard let names = try? FileManager.default.contentsOfDirectory(atPath: "/var/run/vpnc") else {
+        return (false, nil)
+    }
+    var found = false
+    for name in names where name.hasPrefix("openconnectgui-") && name.hasSuffix(".env") {
+        let pidText = String(name.dropFirst("openconnectgui-".count).dropLast(".env".count))
+        guard let pid = pid_t(pidText), pid > 1 else { continue }
+        let path = "/var/run/vpnc/" + name
+        guard isOwnedFile(path, uid: 0), let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else { continue }
+        var environment: [String: String] = [:]
+        for item in data.split(separator: 0) {
+            let pair = String(decoding: item, as: UTF8.self).split(separator: "=", maxSplits: 1)
+            if pair.count == 2 { environment[String(pair[0])] = String(pair[1]) }
+        }
+        guard environment["VPNPID"] == pidText else { continue }
+        if let savedID = environment["OPENCONNECTGUI_PROFILE_ID"] {
+            guard savedID == profileID.uuidString else { continue }
+        } else {
+            guard knownPIDs.contains(pid) else { continue }
+        }
+        if matchingPIDsForProcess(pid) { continue }
+        found = true
+        environment["reason"] = "disconnect"
+        guard let script = installedResource("vpnc-script") else { return (found, "未找到 vpnc-script。") }
+        let result: (Int32, String)
+        if let mode = environment["OPENCONNECTGUI_DNS_MODE"], let wrapper = installedResource("vpnc-wrapper.sh") {
+            result = run(wrapper, [script, mode], environment: environment)
+        } else {
+            result = run(script, [], environment: environment)
+            if result.0 == 0 { try? FileManager.default.removeItem(atPath: path) }
+        }
+        if result.0 != 0 { return (found, "VPN 遗留网络配置清理失败：" + result.1) }
+    }
+    return (found, nil)
+}
+
+private func matchingPIDsForProcess(_ pid: pid_t) -> Bool {
+    let command = run("/bin/ps", ["-p", String(pid), "-o", "command="])
+    return command.0 == 0 && command.1.contains("--pid-file=/var/run/vpnc/openconnectgui-")
+}
+
 private final class HelperSession: NSObject, OpenConnectHelperProtocol {
     private let uid: uid_t
     init(uid: uid_t) { self.uid = uid }
@@ -152,6 +204,9 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
         let pidFile = "/var/run/vpnc/openconnectgui-\(uid)-\(profile.id.uuidString).pid"
         let oldPidFile = directory.appendingPathComponent("openconnect.pid").path
         if !matchingPIDs([pidFile, oldPidFile]).isEmpty { return (-1, "已有 VPN 连接正在运行。") }
+        if let error = cleanupSavedSessions(profile.id, knownPIDs: recordedPIDs([pidFile, oldPidFile])).error {
+            return (-1, error)
+        }
         do {
             try FileManager.default.createDirectory(atPath: "/var/run/vpnc", withIntermediateDirectories: true,
                                                     attributes: [.posixPermissions: 0o755])
@@ -172,7 +227,10 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
                     "--protocol=\(profile.protocolName)", "--user=\(profile.username)",
                     "--reconnect-timeout=\(profile.autoReconnect ? 15 : 0)", "--script=\(script)"]
         if profile.autoReconnect { args.append("--force-dpd=30") }
+        if profile.proxyEnabled { args.append("--proxy=\(profile.proxyURL)") }
+        else { args.append("--no-proxy") }
         if !profile.authGroup.isEmpty { args.append("--authgroup=\(profile.authGroup)") }
+        log.write(Data((profile.proxyEnabled ? "连接方式：HTTP 代理 \(profile.proxyURL)\n" : "连接方式：直连\n").utf8))
         if profile.ignoreCertificateErrors {
             guard let fingerprint = serverCertificateFingerprint(profile.server) else {
                 return (-1, "无法读取服务器证书。")
@@ -187,7 +245,9 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
         task.standardOutput = log
         task.standardError = log
         // The bundled OpenSSL trusts the macOS system CA bundle.
-        task.environment = ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin", "SSL_CERT_FILE": "/etc/ssl/cert.pem"]
+        task.environment = ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin", "SSL_CERT_FILE": "/etc/ssl/cert.pem",
+                            "OPENCONNECTGUI_PROFILE_ID": profile.id.uuidString,
+                            "OPENCONNECTGUI_DNS_MODE": profile.dnsMode.rawValue]
         let input = Pipe()
         task.standardInput = input
         do {
@@ -203,6 +263,14 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
         DispatchQueue.global(qos: .userInitiated).async { [self] in
             let result = stop(profileID)
             reply(result.0, result.1)
+        }
+    }
+
+    func cleanup(_ profileID: String, reply: @escaping (Int32, String) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let id = UUID(uuidString: profileID) else { reply(-1, "连接 ID 无效。"); return }
+            let result = cleanupSavedSessions(id, knownPIDs: [])
+            reply(result.error == nil ? 0 : -1, result.error ?? "")
         }
     }
 
@@ -228,27 +296,22 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
         let pidFiles = ["/var/run/vpnc/openconnectgui-\(uid)-\(id.uuidString).pid",
                         directory.appendingPathComponent("openconnect.pid").path]
         var pids = matchingPIDs(pidFiles)
-        guard !pids.isEmpty else { return (-1, "连接已结束。") }
-        for pid in pids { _ = kill(pid, SIGTERM) }
-        if waitForExit(pidFiles, seconds: 5) { return (0, "") }
-        pids = matchingPIDs(pidFiles)
-        for pid in pids { _ = kill(pid, SIGINT) }
-        if waitForExit(pidFiles, seconds: 3) { return (0, "") }
-        pids = matchingPIDs(pidFiles)
-        for pid in pids { _ = kill(pid, SIGKILL) }
-        for pid in pids {
-            let state = "/var/run/vpnc/openconnectgui-\(pid).env"
-            guard let data = try? Data(contentsOf: URL(fileURLWithPath: state)) else { continue }
-            var environment: [String: String] = [:]
-            for item in data.split(separator: 0) {
-                let pair = String(decoding: item, as: UTF8.self).split(separator: "=", maxSplits: 1)
-                if pair.count == 2 { environment[String(pair[0])] = String(pair[1]) }
+        let knownPIDs = recordedPIDs(pidFiles).union(pids)
+        if !pids.isEmpty {
+            for pid in pids { _ = kill(pid, SIGTERM) }
+            if !waitForExit(pidFiles, seconds: 5) {
+                pids = matchingPIDs(pidFiles)
+                for pid in pids { _ = kill(pid, SIGINT) }
             }
-            environment["reason"] = "disconnect"
-            if let script = installedResource("vpnc-script") { _ = run(script, [], environment: environment) }
-            try? FileManager.default.removeItem(atPath: state)
+            if !waitForExit(pidFiles, seconds: 3) {
+                pids = matchingPIDs(pidFiles)
+                for pid in pids { _ = kill(pid, SIGKILL) }
+            }
         }
-        return waitForExit(pidFiles, seconds: 2) ? (0, "") : (-1, "OpenConnect 没有响应断开请求。")
+        guard waitForExit(pidFiles, seconds: 2) else { return (-1, "OpenConnect 没有响应断开请求。") }
+        let cleanup = cleanupSavedSessions(id, knownPIDs: knownPIDs)
+        if let error = cleanup.error { return (-1, error) }
+        return !knownPIDs.isEmpty || cleanup.found ? (0, "") : (-1, "连接已结束。")
     }
 }
 
