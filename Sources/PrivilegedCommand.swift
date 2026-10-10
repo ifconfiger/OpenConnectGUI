@@ -13,7 +13,7 @@ final class PrivilegedCommand {
     }
 
     func connect(_ profile: VPNProfile, password: String) -> (status: Int32, output: String) {
-        guard let data = try? JSONEncoder().encode(profile) else { return (-1, "无法编码 VPN 配置。") }
+        guard let data = try? JSONEncoder().encode(profile) else { return (-1, String(localized: "Failed to encode the VPN profile.")) }
         return call { helper, reply in helper.connect(data, password: password, reply: reply) }
     }
 
@@ -42,10 +42,10 @@ final class PrivilegedCommand {
         case .requiresApproval:
             SMAppService.openSystemSettingsLoginItems()
             throw NSError(domain: "OpenConnectGUI", code: 1, userInfo: [NSLocalizedDescriptionKey:
-                "请在系统设置 → 通用 → 登录项与扩展中批准 OpenConnectGUI 后重试连接。"])
+                String(localized: "Approve OpenConnectGUI in System Settings → General → Login Items & Extensions, then connect again.")])
         @unknown default:
             throw NSError(domain: "OpenConnectGUI", code: 3, userInfo: [NSLocalizedDescriptionKey:
-                "特权辅助服务状态未知，请检查系统设置中的登录项。"])
+                String(localized: "The privileged helper is in an unknown state. Check Login Items in System Settings.")])
         }
     }
 
@@ -60,7 +60,7 @@ final class PrivilegedCommand {
         defer { connection.invalidate() }
         let semaphore = DispatchSemaphore(value: 0)
         let lock = NSLock()
-        var result: (Int32, String) = (-1, "特权辅助服务没有响应。")
+        var result: (Int32, String) = (-1, String(localized: "The privileged helper did not respond."))
         let finish: (Int32, String) -> Void = { status, message in
             lock.lock()
             result = (status, message)
@@ -68,11 +68,11 @@ final class PrivilegedCommand {
             semaphore.signal()
         }
         guard let proxy = connection.remoteObjectProxyWithErrorHandler({ error in
-            finish(-1, "无法连接特权辅助服务：\(error.localizedDescription)")
-        }) as? OpenConnectHelperProtocol else { return (-1, "无法创建特权辅助服务连接。") }
-        invoke(proxy, finish)
+            finish(-1, String(localized: "Could not connect to the privileged helper: \(error.localizedDescription)"))
+        }) as? OpenConnectHelperProtocol else { return (-1, String(localized: "Could not create a connection to the privileged helper.")) }
+        invoke(proxy) { status, message in finish(status, HelperMessage.localized(message)) }
         guard semaphore.wait(timeout: .now() + 120) == .success else {
-            return (-1, "等待特权辅助服务超时。")
+            return (-1, String(localized: "Timed out waiting for the privileged helper."))
         }
         lock.lock()
         defer { lock.unlock() }

@@ -12,7 +12,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         guard let configuration = protocolConfiguration as? NETunnelProviderProtocol,
               let encodedProfile = configuration.providerConfiguration?["profile"] as? Data,
               let profile = try? JSONDecoder().decode(VPNProfile.self, from: encodedProfile) else {
-            completionHandler(failure(2, "VPN 配置无效，请在 App 中重新保存连接。"))
+            completionHandler(failure(2, String(localized: "Invalid VPN configuration. Save the connection again in the app.")))
             return
         }
         // Starts from the app pass the password; on-demand and system starts
@@ -20,7 +20,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         let password = (options?["password"] as? String)
             ?? (try? KeychainStore.password(for: profile.id)) ?? nil
         guard let password, !password.isEmpty else {
-            completionHandler(failure(3, "未找到保存的 VPN 密码，请在 App 中保存密码后连接。"))
+            completionHandler(failure(3, String(localized: "No saved VPN password. Save the password in the app, then connect.")))
             return
         }
 
@@ -31,7 +31,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         if options?["manual"] != nil {
             AuthFailureGuard.clear(profile.id)
         } else if AuthFailureGuard.hasFailed(profile.id, fingerprint: fingerprint) {
-            completionHandler(failure(4, "保存的账号或密码上次被服务器拒绝，请在 App 中更新后重新连接。"))
+            completionHandler(failure(4, String(localized: "The server rejected the saved username or password last time. Update them in the app and connect again.")))
             return
         }
 
@@ -47,7 +47,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         pathObservation = nil
-        log.append("正在断开连接。")
+        log.append(String(localized: "Disconnecting."))
         guard let tunnel else { completionHandler(); return }
         tunnel.stop(completion: completionHandler)
     }

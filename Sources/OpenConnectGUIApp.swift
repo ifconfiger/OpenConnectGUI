@@ -28,10 +28,10 @@ struct OpenConnectGUIApp: App {
             do {
                 try service.unregister()
                 try service.register()
-                print("辅助服务状态：\(service.status.rawValue)")
+                print("Helper status: \(service.status.rawValue)")
                 exit(service.status == .enabled ? 0 : 2)
             } catch {
-                fputs("辅助服务更新失败：\(error.localizedDescription)\n", stderr)
+                fputs("Failed to update the helper: \(error.localizedDescription)\n", stderr)
                 exit(1)
             }
         }
@@ -39,9 +39,9 @@ struct OpenConnectGUIApp: App {
             let service = SMAppService.daemon(plistName: HelperService.plist)
             if service.status == .notRegistered || service.status == .notFound {
                 do { try service.register() }
-                catch { fputs("辅助服务注册失败：\(error.localizedDescription)\n", stderr); exit(1) }
+                catch { fputs("Failed to register the helper: \(error.localizedDescription)\n", stderr); exit(1) }
             }
-            print("辅助服务状态：\(service.status.rawValue)")
+            print("Helper status: \(service.status.rawValue)")
             exit(service.status == .enabled ? 0 : 2)
         }
     }
@@ -67,21 +67,21 @@ private struct MenuBarContent: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        Text(model.connectedID != nil ? "VPN 已连接" : model.waitingForNetwork ? "等待网络恢复" : "VPN 未连接")
-        Button("打开主窗口") {
+        Text(model.connectedID != nil ? "VPN Connected" : model.waitingForNetwork ? "Waiting for Network" : "VPN Disconnected")
+        Button("Open Main Window") {
             NSApp.setActivationPolicy(.regular)
             openWindow(id: "main")
             NSApp.activate(ignoringOtherApps: true)
         }
         Divider()
         if model.isConnected {
-            Button("断开连接") { model.disconnect() }.disabled(model.busy)
+            Button("Disconnect") { model.disconnect() }.disabled(model.busy)
         } else {
-            Button("连接") { model.connect() }
+            Button("Connect") { model.connect() }
                 .disabled(model.busy || !model.canSave || model.connectedID != nil)
         }
         Divider()
-        Button("退出 OpenConnect GUI") { NSApp.terminate(nil) }
+        Button("Quit OpenConnect GUI") { NSApp.terminate(nil) }
     }
 }
 
@@ -105,9 +105,9 @@ private struct ContentView: View {
                 Divider()
                 HStack {
                     Button(action: model.add) { Image(systemName: "plus") }
-                        .help("新增连接")
+                        .help("Add Connection")
                     Button(action: model.delete) { Image(systemName: "minus") }
-                        .help("删除连接")
+                        .help("Delete Connection")
                         .disabled(model.selectedID == nil || model.isConnected || model.busy)
                     Spacer()
                 }
@@ -121,8 +121,8 @@ private struct ContentView: View {
             } else {
                 VStack(spacing: 10) {
                     Image(systemName: "network").font(.largeTitle)
-                    Text("尚无连接").font(.title3)
-                    Text("点击左下角的加号添加 VPN。").foregroundStyle(.secondary)
+                    Text("No Connections").font(.title3)
+                    Text("Click the plus button at the bottom left to add a VPN.").foregroundStyle(.secondary)
                 }
             }
         }
@@ -132,17 +132,17 @@ private struct ContentView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(model.name.isEmpty ? "新连接" : model.name).font(.title2.bold())
-                    Label(model.isConnected ? "已连接" : model.waitingForNetwork ? "等待网络恢复" : model.busy ? "正在处理…" : "未连接",
+                    Text(model.name.isEmpty ? String(localized: "New Connection") : model.name).font(.title2.bold())
+                    Label(model.isConnected ? "Connected" : model.waitingForNetwork ? "Waiting for Network" : model.busy ? "Working…" : "Not Connected",
                           systemImage: model.isConnected ? "checkmark.circle.fill" : model.waitingForNetwork ? "wifi.slash" : "circle")
                         .foregroundStyle(model.isConnected ? .green : model.waitingForNetwork ? .orange : .secondary)
                 }
                 Spacer()
                 if model.busy { ProgressView().controlSize(.small) }
                 if model.isConnected {
-                    Button("断开连接", action: model.disconnect).disabled(model.busy)
+                    Button("Disconnect", action: model.disconnect).disabled(model.busy)
                 } else {
-                    Button("连接", action: model.connect)
+                    Button("Connect", action: model.connect)
                         .buttonStyle(.borderedProminent)
                         .disabled(model.busy || !model.canSave || model.connectedID != nil)
                 }
@@ -157,16 +157,16 @@ private struct ContentView: View {
                         Image(systemName: "xmark")
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("关闭提示")
+                    .accessibilityLabel("Dismiss")
                 }
                 .foregroundStyle(.red)
                 .padding(10)
                 .background(.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
             }
 
-            Picker("详情", selection: $selectedTab) {
-                Text("账号").tag(0)
-                Text("日志").tag(1)
+            Picker("Details", selection: $selectedTab) {
+                Text("Account").tag(0)
+                Text("Log").tag(1)
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -183,14 +183,14 @@ private struct ContentView: View {
     private var accountTab: some View {
         VStack(spacing: 12) {
             Form {
-                TextField("名称", text: $model.name)
-                TextField("服务器", text: $model.server, prompt: Text("vpn.example.com"))
-                Toggle("使用 HTTP 代理", isOn: $model.proxyEnabled)
+                TextField("Name", text: $model.name)
+                TextField("Server", text: $model.server, prompt: Text("vpn.example.com"))
+                Toggle("Use HTTP Proxy", isOn: $model.proxyEnabled)
                 if model.proxyEnabled {
-                    TextField("HTTP 代理地址", text: $model.proxyURL,
+                    TextField("HTTP Proxy Address", text: $model.proxyURL,
                               prompt: Text("http://127.0.0.1:7897"))
                 }
-                Picker("协议", selection: $model.protocolName) {
+                Picker("Protocol", selection: $model.protocolName) {
                     ForEach(VPNProtocol.allCases) { vpnProtocol in
                         Text(vpnProtocol.title).tag(vpnProtocol.rawValue)
                     }
@@ -200,24 +200,24 @@ private struct ContentView: View {
                         Text(mode.title).tag(mode)
                     }
                 }
-                Toggle("断线自动重连", isOn: $model.autoReconnect)
-                Toggle("忽略证书错误（不安全）", isOn: $model.ignoreCertificateErrors)
-                TextField("认证组（可选）", text: $model.authGroup)
-                TextField("用户名", text: $model.username)
-                SecureField("密码", text: $model.password)
+                Toggle("Reconnect Automatically", isOn: $model.autoReconnect)
+                Toggle("Ignore Certificate Errors (Insecure)", isOn: $model.ignoreCertificateErrors)
+                TextField("Auth Group (Optional)", text: $model.authGroup)
+                TextField("Username", text: $model.username)
+                SecureField("Password", text: $model.password)
             }
             .formStyle(.grouped)
             .disabled(model.busy || model.isConnected)
 
             HStack {
-                Text("密码保存在本机钥匙串")
+                Text("Passwords are stored in this Mac's keychain.")
                     .font(.caption).foregroundStyle(.secondary)
                 Spacer()
                 if model.savedNotice {
-                    Label("已保存", systemImage: "checkmark.circle.fill")
+                    Label("Saved", systemImage: "checkmark.circle.fill")
                         .font(.caption).foregroundStyle(.green)
                 }
-                Button("保存", action: model.saveTapped)
+                Button("Save", action: model.saveTapped)
                     .disabled(!model.canSave || model.busy || model.isConnected)
             }
             Spacer(minLength: 0)
@@ -226,7 +226,7 @@ private struct ContentView: View {
 
     private var logTab: some View {
         ScrollView {
-            Text(model.log.isEmpty ? "暂无日志" : model.log)
+            Text(model.log.isEmpty ? String(localized: "No logs yet") : model.log)
                 .font(.system(.caption, design: .monospaced))
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .textSelection(.enabled)

@@ -57,7 +57,7 @@ enum DNSMode: String, Codable, CaseIterable, Identifiable {
     case remote, local
 
     var id: String { rawValue }
-    var title: String { self == .remote ? "远程 VPN DNS" : "本地 DNS" }
+    var title: String { self == .remote ? String(localized: "Remote VPN DNS") : String(localized: "Local DNS") }
 }
 
 enum VPNProtocol: String, CaseIterable, Identifiable {

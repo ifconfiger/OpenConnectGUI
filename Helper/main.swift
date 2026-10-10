@@ -173,16 +173,16 @@ private func connectFailureReason(_ logPath: String) -> String? {
     guard let data = try? handle.readToEnd() else { return nil }
     let tail = String(decoding: data, as: UTF8.self)
     if tail.contains("401 Authentication failed") || tail.contains("Got HTTP response: HTTP/1.1 401") {
-        return "服务器拒绝了用户名或密码。请在账号设置中核对用户名并重新输入密码。"
+        return "The server rejected the username or password. Check the username in the account settings and re-enter the password."
     }
     if tail.contains("Can't assign requested address") {
-        return "无法连接服务器：本机有一条指向失效网关的主机路由。请重试一次；若仍失败，用 netstat -rn -f inet 查看指向服务器 IP 的 UGHS 路由。"
+        return "Cannot reach the server: a host route points to a gateway that is gone. Try once more; if it still fails, look for a UGHS route to the server IP with netstat -rn -f inet."
     }
     if tail.contains("failed verification") {
-        return "服务器证书校验失败。请核对服务器地址，或在账号设置中开启“忽略证书错误（不安全）”。"
+        return "Server certificate verification failed. Check the server address, or turn on “Ignore Certificate Errors (Insecure)” in the account settings."
     }
     if tail.contains("Failed to connect to host") || tail.contains("Failed to open HTTPS connection") {
-        return "无法连接服务器。请检查网络、服务器地址与端口。"
+        return "Cannot reach the server. Check the network, server address and port."
     }
     return nil
 }
@@ -220,7 +220,7 @@ private func cleanupSavedSessions(_ profileID: UUID, knownPIDs: Set<pid_t>) -> (
         if matchingPIDsForProcess(pid) { continue }
         found = true
         environment["reason"] = "disconnect"
-        guard let script = installedResource("vpnc-script") else { return (found, "未找到 vpnc-script。") }
+        guard let script = installedResource("vpnc-script") else { return (found, "vpnc-script not found.") }
         let result: (Int32, String)
         if let mode = environment["OPENCONNECTGUI_DNS_MODE"], let wrapper = installedResource("vpnc-wrapper.sh") {
             result = run(wrapper, [script, mode], environment: environment)
@@ -228,7 +228,7 @@ private func cleanupSavedSessions(_ profileID: UUID, knownPIDs: Set<pid_t>) -> (
             result = run(script, [], environment: environment)
             if result.0 == 0 { try? FileManager.default.removeItem(atPath: path) }
         }
-        if result.0 != 0 { return (found, "VPN 遗留网络配置清理失败：" + result.1) }
+        if result.0 != 0 { return (found, HelperMessage.cleanupFailedPrefix + result.1) }
     }
     return (found, nil)
 }
@@ -258,20 +258,20 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
               isOwnedDirectory(sessions.path, uid: uid),
               isOwnedDirectory(directory.path, uid: uid),
               isOwnedFile(directory.appendingPathComponent("openconnect.log").path, uid: uid) else {
-            return (-1, "连接参数或会话目录无效。")
+            return (-1, "Invalid connection parameters or session directory.")
         }
         guard let binary = bundledOpenConnect(), FileManager.default.isExecutableFile(atPath: binary) else {
-            return (-1, "App 内置的 OpenConnect 缺失，请重新安装应用。")
+            return (-1, "The bundled OpenConnect is missing. Please reinstall the app.")
         }
         guard let vpncScript = installedResource("vpnc-script"),
-              FileManager.default.isExecutableFile(atPath: vpncScript) else { return (-1, "未找到 vpnc-script。") }
+              FileManager.default.isExecutableFile(atPath: vpncScript) else { return (-1, "vpnc-script not found.") }
         guard let wrapper = installedResource("vpnc-wrapper.sh"),
               FileManager.default.isExecutableFile(atPath: wrapper) else {
-            return (-1, "未找到内置网络脚本。")
+            return (-1, "The bundled network script was not found.")
         }
         let pidFile = "/var/run/vpnc/openconnectgui-\(uid)-\(profile.id.uuidString).pid"
         let oldPidFile = directory.appendingPathComponent("openconnect.pid").path
-        if !matchingPIDs([pidFile, oldPidFile]).isEmpty { return (-1, "已有 VPN 连接正在运行。") }
+        if !matchingPIDs([pidFile, oldPidFile]).isEmpty { return (-1, "A VPN connection is already running.") }
         if let error = cleanupSavedSessions(profile.id, knownPIDs: recordedPIDs([pidFile, oldPidFile])).error {
             return (-1, error)
         }
@@ -282,12 +282,12 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
         _ = unlink(pidFile)
         let logPath = directory.appendingPathComponent("openconnect.log").path
         let fd = open(logPath, O_WRONLY | O_APPEND | O_NOFOLLOW)
-        guard fd >= 0 else { return (-1, "无法打开连接日志。") }
+        guard fd >= 0 else { return (-1, "Could not open the connection log.") }
         var info = stat()
         guard fstat(fd, &info) == 0, (info.st_mode & S_IFMT) == S_IFREG,
               info.st_uid == uid, (info.st_mode & 0o077) == 0 else {
             close(fd)
-            return (-1, "连接日志权限不安全。")
+            return (-1, "The connection log has unsafe permissions.")
         }
         let log = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
         pruneStaleServerRoutes(profile, wrapper: wrapper, script: vpncScript, log: log)
@@ -299,12 +299,12 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
         if profile.proxyEnabled { args.append("--proxy=\(profile.proxyURL)") }
         else { args.append("--no-proxy") }
         if !profile.authGroup.isEmpty { args.append("--authgroup=\(profile.authGroup)") }
-        log.write(Data((profile.proxyEnabled ? "连接方式：HTTP 代理 \(profile.proxyURL)\n" : "连接方式：直连\n").utf8))
+        log.write(Data((profile.proxyEnabled ? "Route: HTTP proxy \(profile.proxyURL)\n" : "Route: direct\n").utf8))
         if profile.ignoreCertificateErrors {
             guard let fingerprint = serverCertificateFingerprint(profile.server) else {
-                return (-1, "无法读取服务器证书。")
+                return (-1, "Could not read the server certificate.")
             }
-            log.write(Data("已忽略证书错误，信任服务器证书 SHA1 \(fingerprint)\n".utf8))
+            log.write(Data("Ignoring certificate errors; trusting server certificate SHA1 \(fingerprint)\n".utf8))
             args.append("--servercert=\(fingerprint)")
         }
         args.append(profile.server)
@@ -326,7 +326,7 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
             task.waitUntilExit()
             if task.terminationStatus == 0 { return (0, "") }
             return (task.terminationStatus,
-                    connectFailureReason(logPath) ?? "OpenConnect 连接失败，请查看日志。")
+                    connectFailureReason(logPath) ?? "OpenConnect failed to connect; see the log.")
         } catch { return (-1, error.localizedDescription) }
     }
 
@@ -339,7 +339,7 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
 
     func cleanup(_ profileID: String, reply: @escaping (Int32, String) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            guard let id = UUID(uuidString: profileID) else { reply(-1, "连接 ID 无效。"); return }
+            guard let id = UUID(uuidString: profileID) else { reply(-1, "Invalid connection ID."); return }
             let result = cleanupSavedSessions(id, knownPIDs: [])
             reply(result.error == nil ? 0 : -1, result.error ?? "")
         }
@@ -348,21 +348,21 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
     func refreshNetwork(_ profileID: String, reply: @escaping (Int32, String) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async { [self] in
             guard let id = UUID(uuidString: profileID), let directory = sessionDirectory(uid, id) else {
-                reply(-1, "连接 ID 无效。")
+                reply(-1, "Invalid connection ID.")
                 return
             }
             let pidFiles = ["/var/run/vpnc/openconnectgui-\(uid)-\(id.uuidString).pid",
                             directory.appendingPathComponent("openconnect.pid").path]
             let pids = matchingPIDs(pidFiles)
-            guard !pids.isEmpty else { reply(-1, "连接已结束。"); return }
+            guard !pids.isEmpty else { reply(-1, "The connection has ended."); return }
             let succeeded = pids.map { kill($0, SIGUSR2) == 0 }.allSatisfy { $0 }
-            reply(succeeded ? 0 : -1, succeeded ? "" : "无法通知 OpenConnect 重新连接。")
+            reply(succeeded ? 0 : -1, succeeded ? "" : "Could not tell OpenConnect to reconnect.")
         }
     }
 
     private func stop(_ profileID: String) -> (Int32, String) {
         guard let id = UUID(uuidString: profileID), let directory = sessionDirectory(uid, id) else {
-            return (-1, "连接 ID 无效。")
+            return (-1, "Invalid connection ID.")
         }
         let pidFiles = ["/var/run/vpnc/openconnectgui-\(uid)-\(id.uuidString).pid",
                         directory.appendingPathComponent("openconnect.pid").path]
@@ -379,10 +379,10 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
                 for pid in pids { _ = kill(pid, SIGKILL) }
             }
         }
-        guard waitForExit(pidFiles, seconds: 2) else { return (-1, "OpenConnect 没有响应断开请求。") }
+        guard waitForExit(pidFiles, seconds: 2) else { return (-1, "OpenConnect did not respond to the disconnect request.") }
         let cleanup = cleanupSavedSessions(id, knownPIDs: knownPIDs)
         if let error = cleanup.error { return (-1, error) }
-        return !knownPIDs.isEmpty || cleanup.found ? (0, "") : (-1, "连接已结束。")
+        return !knownPIDs.isEmpty || cleanup.found ? (0, "") : (-1, "The connection has ended.")
     }
 }
 

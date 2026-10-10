@@ -18,6 +18,7 @@ schemes:
         OpenConnectPacketTunnel: all
 options:
   bundleIdPrefix: xyz.nows
+  developmentLanguage: en
   deploymentTarget:
     macOS: "13.0"
     iOS: "16.0"
@@ -28,6 +29,7 @@ targets:
     sources:
       - path: Sources
       - path: Resources/Assets.xcassets
+      - path: Resources/Localizable.xcstrings
       - path: Helper/vpnc-wrapper.sh
         buildPhase: resources
       - path: Vendor/OpenConnect/vpnc-script
@@ -91,6 +93,7 @@ targets:
       - path: Sources/Profile.swift
       - path: Sources/KeychainStore.swift
       - path: iOS/Assets.xcassets
+      - path: Resources/Localizable.xcstrings
     dependencies:
       - target: OpenConnectPacketTunnel
         embed: true
@@ -125,6 +128,7 @@ targets:
         excludes: [Info.plist]
       - path: Sources/Profile.swift
       - path: Sources/KeychainStore.swift
+      - path: Resources/Localizable.xcstrings
     dependencies:
       - framework: Vendor/OpenConnect/OpenConnect.xcframework
         embed: false

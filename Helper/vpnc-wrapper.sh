@@ -33,7 +33,7 @@ stale_gateway_route() {
 if [ "$reason" = openconnectgui-prune ]; then
   if stale_gateway_route; then
     route -n delete -host "$VPNGATEWAY" || exit $?
-    echo "已清理残留路由 $VPNGATEWAY（网关 $route_gateway 已不可达）"
+    echo "Removed stale route $VPNGATEWAY (gateway $route_gateway is unreachable)"
   fi
   exit 0
 fi

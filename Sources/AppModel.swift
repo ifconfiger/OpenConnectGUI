@@ -56,7 +56,7 @@ final class AppModel: ObservableObject {
     }
 
     func add() {
-        let profile = VPNProfile(name: "新连接", server: "", username: "")
+        let profile = VPNProfile(name: String(localized: "New Connection"), server: "", username: "")
         profiles.append(profile)
         select(profile.id)
     }
@@ -145,7 +145,7 @@ final class AppModel: ObservableObject {
                     reconnectExhausted = false
                     waitingForNetwork = true
                 } else {
-                    errorMessage = "当前没有可用网络。"
+                    errorMessage = String(localized: "No network is available.")
                 }
                 return
             }
@@ -196,7 +196,7 @@ final class AppModel: ObservableObject {
                 let result = PrivilegedCommand.shared.cleanup(profile)
                 await MainActor.run {
                     self.busy = false
-                    if result.status != 0 { self.errorMessage = "VPN 退出后清理失败：" + result.output }
+                    if result.status != 0 { self.errorMessage = String(localized: "Cleanup after the VPN exited failed: \(result.output)") }
                 }
             }
         }
@@ -267,7 +267,7 @@ final class AppModel: ObservableObject {
                 self.busy = false
                 if case .failure(let error) = result,
                    OpenConnectController.runningPID(for: profile) != nil {
-                    self.errorMessage = "断网后暂停 VPN 失败：" + error.localizedDescription
+                    self.errorMessage = String(localized: "Failed to pause the VPN after the network went down: \(error.localizedDescription)")
                 }
                 self.refresh()
             }
@@ -283,7 +283,7 @@ final class AppModel: ObservableObject {
                 self.busy = false
                 if case .failure(let error) = result,
                    OpenConnectController.runningPID(for: profile) != nil {
-                    self.errorMessage = "网络切换后重新连接失败：" + error.localizedDescription
+                    self.errorMessage = String(localized: "Failed to reconnect after the network changed: \(error.localizedDescription)")
                 }
                 self.refresh()
             }
@@ -318,7 +318,7 @@ final class AppModel: ObservableObject {
                     self.reconnectAttempts += 1
                     if self.reconnectAttempts >= 3 {
                         self.reconnectExhausted = true
-                        self.errorMessage = "自动重连已暂停，网络变化后会重试：" + error.localizedDescription
+                        self.errorMessage = String(localized: "Auto-reconnect paused; it will retry when the network changes: \(error.localizedDescription)")
                     } else {
                         self.nextReconnectAt = Date().addingTimeInterval(Double(5 * (1 << self.reconnectAttempts)))
                     }

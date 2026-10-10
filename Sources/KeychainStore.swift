@@ -49,6 +49,6 @@ enum KeychainStore {
     private static func keychainError(_ status: OSStatus) -> NSError {
         NSError(domain: NSOSStatusErrorDomain, code: Int(status),
                 userInfo: [NSLocalizedDescriptionKey:
-                    SecCopyErrorMessageString(status, nil) as String? ?? "钥匙串操作失败（\(status)）"])
+                    SecCopyErrorMessageString(status, nil) as String? ?? String(localized: "Keychain operation failed (\(status))")])
     }
 }

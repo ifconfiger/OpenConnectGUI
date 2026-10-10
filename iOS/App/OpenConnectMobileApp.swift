@@ -51,11 +51,11 @@ final class MobileVPNModel: ObservableObject {
     var isConnected: Bool { status == .connected || status == .connecting || status == .reasserting }
     var statusText: String {
         switch status {
-        case .connected: "已连接"
-        case .connecting: "正在连接…"
-        case .reasserting: "正在重新连接…"
-        case .disconnecting: "正在断开…"
-        default: "未连接"
+        case .connected: String(localized: "Connected")
+        case .connecting: String(localized: "Connecting…")
+        case .reasserting: String(localized: "Reconnecting…")
+        case .disconnecting: String(localized: "Disconnecting…")
+        default: String(localized: "Not Connected")
         }
     }
     var canSave: Bool {
@@ -65,7 +65,7 @@ final class MobileVPNModel: ObservableObject {
     }
 
     func add() {
-        let profile = VPNProfile(name: "新连接", server: "", username: "")
+        let profile = VPNProfile(name: String(localized: "New Connection"), server: "", username: "")
         profiles.append(profile)
         select(profile.id)
     }
@@ -89,7 +89,7 @@ final class MobileVPNModel: ObservableObject {
     @discardableResult
     func save() -> Bool {
         guard canSave else {
-            message = "请填写名称、服务器和用户名。"
+            message = String(localized: "Enter a name, server and username.")
             return false
         }
         do {
@@ -111,7 +111,7 @@ final class MobileVPNModel: ObservableObject {
             try KeychainStore.save(password, for: id)
             try MobileProfileStore.save(profiles)
             message = nil
-            show(notice: "已保存")
+            show(notice: String(localized: "Saved"))
             return true
         } catch {
             message = error.localizedDescription
@@ -143,7 +143,7 @@ final class MobileVPNModel: ObservableObject {
     func connect() {
         guard save() else { return }
         guard let profile = selectedProfile, !password.isEmpty else {
-            message = "请填写并保存 VPN 密码。"
+            message = String(localized: "Enter and save the VPN password.")
             return
         }
         message = nil
@@ -170,10 +170,10 @@ final class MobileVPNModel: ObservableObject {
                 try manager.connection.startVPNTunnel(options: ["password": password as NSString,
                                                                 "manual": NSNumber(value: true)])
                 status = manager.connection.status
-                log = "正在连接 \(profile.server)…"
+                log = String(localized: "Connecting to \(profile.server)…")
             } catch {
                 message = error.localizedDescription
-                log = "连接失败：\(error.localizedDescription)"
+                log = String(localized: "Connection failed: \(error.localizedDescription)")
             }
         }
     }
@@ -188,7 +188,7 @@ final class MobileVPNModel: ObservableObject {
                 try await save(manager)
                 manager.connection.stopVPNTunnel()
                 status = manager.connection.status
-                log = "已请求断开连接。"
+                log = String(localized: "Disconnect requested.")
             } catch { message = error.localizedDescription }
         }
     }
@@ -247,7 +247,7 @@ final class MobileVPNModel: ObservableObject {
                 ?? error.localizedDescription
             Task { @MainActor in
                 self?.message = message
-                self?.log += (self?.log.isEmpty == false ? "\n" : "") + "连接已结束：\(message)"
+                self?.log += (self?.log.isEmpty == false ? "\n" : "") + String(localized: "Connection ended: \(message)")
             }
         }
     }
@@ -255,7 +255,7 @@ final class MobileVPNModel: ObservableObject {
     private func currentManager() async throws -> NETunnelProviderManager {
         if manager == nil { await loadManager() }
         guard let manager else { throw NSError(domain: "OpenConnect", code: 1,
-            userInfo: [NSLocalizedDescriptionKey: "无法加载系统 VPN 配置。"]) }
+            userInfo: [NSLocalizedDescriptionKey: String(localized: "Could not load the system VPN configuration.")]) }
         return manager
     }
 
@@ -286,7 +286,7 @@ private struct MobileContentView: View {
         NavigationStack {
             VStack(spacing: 12) {
                 if !model.profiles.isEmpty {
-                    Picker("连接", selection: Binding(get: { model.selectedID }, set: { model.select($0) })) {
+                    Picker("Connection", selection: Binding(get: { model.selectedID }, set: { model.select($0) })) {
                         ForEach(model.profiles) { profile in
                             Text(profile.name).tag(Optional(profile.id))
                         }
@@ -300,7 +300,7 @@ private struct MobileContentView: View {
                           systemImage: model.status == .connected ? "checkmark.shield.fill" : "network")
                         .foregroundStyle(model.status == .connected ? .green : .secondary)
                     Spacer()
-                    Button(model.isConnected ? "断开连接" : "连接") {
+                    Button(model.isConnected ? "Disconnect" : "Connect") {
                         if model.isConnected { model.disconnect() } else { model.connect() }
                     }
                     .buttonStyle(.borderedProminent)
@@ -314,9 +314,9 @@ private struct MobileContentView: View {
                         .padding(.horizontal)
                 }
 
-                Picker("详情", selection: $tab) {
-                    Text("账号").tag(0)
-                    Text("日志").tag(1)
+                Picker("Details", selection: $tab) {
+                    Text("Account").tag(0)
+                    Text("Log").tag(1)
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
@@ -338,10 +338,10 @@ private struct MobileContentView: View {
             .navigationTitle("OpenConnect")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("新增", systemImage: "plus", action: model.add)
+                    Button("Add", systemImage: "plus", action: model.add)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("删除", systemImage: "trash", action: model.delete)
+                    Button("Delete", systemImage: "trash", action: model.delete)
                         .disabled(model.selectedID == nil || model.isConnected)
                 }
             }
@@ -350,35 +350,35 @@ private struct MobileContentView: View {
 
     private var account: some View {
         Form {
-            TextField("名称", text: $model.name)
-            TextField("服务器", text: $model.server)
+            TextField("Name", text: $model.name)
+            TextField("Server", text: $model.server)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-            Picker("协议", selection: $model.protocolName) {
+            Picker("Protocol", selection: $model.protocolName) {
                 ForEach(VPNProtocol.allCases) { item in Text(item.title).tag(item.rawValue) }
             }
             Picker("DNS", selection: $model.dnsMode) {
                 ForEach(DNSMode.allCases) { item in Text(item.title).tag(item) }
             }
-            Toggle("断线自动重连", isOn: $model.autoReconnect)
-            Toggle("忽略证书错误（不安全）", isOn: $model.ignoreCertificateErrors)
-            TextField("认证组（可选）", text: $model.authGroup)
-            TextField("用户名", text: $model.username)
+            Toggle("Reconnect Automatically", isOn: $model.autoReconnect)
+            Toggle("Ignore Certificate Errors (Insecure)", isOn: $model.ignoreCertificateErrors)
+            TextField("Auth Group (Optional)", text: $model.authGroup)
+            TextField("Username", text: $model.username)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-            SecureField("密码", text: $model.password)
+            SecureField("Password", text: $model.password)
             Section {
                 Button {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
                                                     to: nil, from: nil, for: nil)
                     model.save()
                 } label: {
-                    Text("保存").frame(maxWidth: .infinity)
+                    Text("Save").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(model.isConnected)
             } footer: {
-                Text("密码保存在钥匙串，VPN 扩展自动读取，无需每次输入。")
+                Text("Passwords are stored in the keychain and read by the VPN extension automatically, so you don't have to enter them each time.")
             }
         }
         .scrollDismissesKeyboard(.interactively)
@@ -387,7 +387,7 @@ private struct MobileContentView: View {
 
     private var log: some View {
         ScrollView {
-            Text(model.log.isEmpty ? "暂无日志" : model.log)
+            Text(model.log.isEmpty ? String(localized: "No logs yet") : model.log)
                 .font(.system(.footnote, design: .monospaced))
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding()

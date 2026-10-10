@@ -15,15 +15,15 @@ enum VPNError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidServer: "服务器地址无效，请填写主机名或 HTTPS 地址。"
-        case .invalidProxy: "HTTP 代理地址无效，请填写 http://主机:端口。"
-        case .missingBinary: "App 内置的 OpenConnect 缺失，请重新安装应用。"
-        case .missingPassword: "请填写并保存 VPN 密码。"
-        case .alreadyConnected: "已有 VPN 连接正在运行。"
-        case .noConnection: "连接已结束。"
-        case .passwordPipeTimeout: "等待 OpenConnect 读取密码超时。"
-        case .missingScript: "App 内置的 vpnc-script 缺失，无法配置网络。"
-        case .disconnectTimedOut: "OpenConnect 没有响应断开请求；请查看日志。"
+        case .invalidServer: String(localized: "Invalid server address. Enter a host name or an HTTPS URL.")
+        case .invalidProxy: String(localized: "Invalid HTTP proxy address. Use http://host:port.")
+        case .missingBinary: String(localized: "The bundled OpenConnect is missing. Please reinstall the app.")
+        case .missingPassword: String(localized: "Enter and save the VPN password.")
+        case .alreadyConnected: String(localized: "A VPN connection is already running.")
+        case .noConnection: String(localized: "The connection has ended.")
+        case .passwordPipeTimeout: String(localized: "Timed out waiting for OpenConnect to read the password.")
+        case .missingScript: String(localized: "The bundled vpnc-script is missing; the network cannot be configured.")
+        case .disconnectTimedOut: String(localized: "OpenConnect did not respond to the disconnect request; see the log.")
         case .commandFailed(let message): message
         }
     }
@@ -80,17 +80,18 @@ enum OpenConnectController {
                                                 attributes: [.posixPermissions: 0o700])
         try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: directory.path)
         let log = logURL(for: profile)
-        let heading = "=== 连接 \(profile.server) · \(ISO8601DateFormatter().string(from: Date())) ===\n"
+        let timestamp = ISO8601DateFormatter().string(from: Date())
+        let heading = String(localized: "=== Connecting to \(profile.server) · \(timestamp) ===") + "\n"
         try Data(heading.utf8).write(to: log, options: .atomic)
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: log.path)
 
         guard vpncScript != nil else { throw VPNError.missingScript }
         let result = PrivilegedCommand.shared.connect(profile, password: password)
         if result.status != 0 {
-            throw VPNError.commandFailed(result.output.isEmpty ? "连接失败，请查看日志。" : result.output)
+            throw VPNError.commandFailed(result.output.isEmpty ? String(localized: "Connection failed; see the log.") : result.output)
         }
         guard runningPID(for: profile) != nil else {
-            throw VPNError.commandFailed(readLog(for: profile).isEmpty ? "OpenConnect 未建立连接。" : readLog(for: profile))
+            throw VPNError.commandFailed(readLog(for: profile).isEmpty ? String(localized: "OpenConnect did not establish a connection.") : readLog(for: profile))
         }
         let deadline = Date().addingTimeInterval(30)
         while Date() < deadline {
@@ -98,19 +99,19 @@ enum OpenConnectController {
             if currentLog.contains("OPENCONNECTGUI_NETWORK_READY") { return }
             if currentLog.contains("returned error") || runningPID(for: profile) == nil {
                 try? disconnect(profile)
-                throw VPNError.commandFailed("VPN 认证完成，但网络配置失败。请查看日志。")
+                throw VPNError.commandFailed(String(localized: "VPN authentication succeeded, but network configuration failed. See the log."))
             }
             Thread.sleep(forTimeInterval: 0.2)
         }
         try? disconnect(profile)
-        throw VPNError.commandFailed("VPN 网络配置超时。请查看日志。")
+        throw VPNError.commandFailed(String(localized: "VPN network configuration timed out. See the log."))
     }
 
     static func disconnect(_ profile: VPNProfile) throws {
         guard runningPID(for: profile) != nil else { throw VPNError.noConnection }
         let result = PrivilegedCommand.shared.disconnect(profile)
         guard result.status == 0 else {
-            throw VPNError.commandFailed(result.output.isEmpty ? "断开失败。" : result.output)
+            throw VPNError.commandFailed(result.output.isEmpty ? String(localized: "Disconnect failed.") : result.output)
         }
         guard waitForExit(profile, seconds: 2) else { throw VPNError.disconnectTimedOut }
     }
@@ -118,7 +119,7 @@ enum OpenConnectController {
     static func refreshNetwork(_ profile: VPNProfile) throws {
         let result = PrivilegedCommand.shared.refreshNetwork(profile)
         guard result.status == 0 else {
-            throw VPNError.commandFailed(result.output.isEmpty ? "重新建立 VPN 连接失败。" : result.output)
+            throw VPNError.commandFailed(result.output.isEmpty ? String(localized: "Failed to re-establish the VPN connection.") : result.output)
         }
     }
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D955BA9E10E6F1A33EC78B2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D0ADB2D14F93469AA1BF5B4C /* Localizable.xcstrings */; };
 		190EFB305ACAF430CFEF7796 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
 		213E60969BEABFE4795B3C55 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A707CC63006F349D53F08B /* PacketTunnelProvider.swift */; };
 		2375679F8E9311FBD7CD20B0 /* OpenConnectController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0D1C043B4E411B44A587E9 /* OpenConnectController.swift */; };
@@ -28,8 +29,10 @@
 		9DA426F5C1E0CFD0D63250A0 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D78A8EEF8021FCEF6456AB7E /* libxml2.tbd */; };
 		A473D231A7FA141126FBCDCE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89D3C34D9DE620E4F88D9910 /* Assets.xcassets */; };
 		B20902AC8920A7F69E460EBD /* openconnect in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5157482F725042E23C8EC2D /* openconnect */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		B8DDB11173345BFD8F951E51 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D0ADB2D14F93469AA1BF5B4C /* Localizable.xcstrings */; };
 		BCC9FA7C3C62FA48926164C8 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 59232A5AE8CB9812C5E6188A /* libz.tbd */; };
 		C3E0ADD8548FA5A8FC896CC5 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 260503F3DAC67E7EA7BA5189 /* libiconv.tbd */; };
+		C8823209F1D48B34D578ECDB /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D0ADB2D14F93469AA1BF5B4C /* Localizable.xcstrings */; };
 		D6B2C5BB10CF0AE620387891 /* vpnc-wrapper.sh in Resources */ = {isa = PBXBuildFile; fileRef = E345363780A0B5EDC2E0872F /* vpnc-wrapper.sh */; };
 		DFCB79812B388EFD18CE558B /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 959373107C77E2944FE8165C /* ProfileStore.swift */; };
 		E536FA9FF1622C42F5E30595 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 856AA14F45B979CCABBF30B1 /* Security.framework */; };
@@ -112,6 +115,7 @@
 		B67BBA81ACB9FB5D7E493F9E /* OpenConnectPacketTunnel.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = OpenConnectPacketTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1365DF5B210A3BFC7444A29 /* OpenConnectGUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectGUIApp.swift; sourceTree = "<group>"; };
 		C5157482F725042E23C8EC2D /* openconnect */ = {isa = PBXFileReference; path = openconnect; sourceTree = "<group>"; };
+		D0ADB2D14F93469AA1BF5B4C /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		D78A8EEF8021FCEF6456AB7E /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		DA0D1C043B4E411B44A587E9 /* OpenConnectController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenConnectController.swift; sourceTree = "<group>"; };
 		DE4FF96F129C9955E8E7DAAB /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
@@ -225,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				2CBFC0625B37175B4FA04072 /* Assets.xcassets */,
+				D0ADB2D14F93469AA1BF5B4C /* Localizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -325,6 +330,7 @@
 			buildConfigurationList = 4E93AEACDA688AB2047D2999 /* Build configuration list for PBXNativeTarget "OpenConnectPacketTunnel" */;
 			buildPhases = (
 				2BB3287E8E1C712C8CCB9784 /* Sources */,
+				42A4AC3EDE934612631B5DF3 /* Resources */,
 				DBEDFE51BD12C6B7479FD680 /* Frameworks */,
 			);
 			buildRules = (
@@ -380,19 +386,28 @@
 			projectRoot = "";
 			targets = (
 				20002E9F36A7778B4AA485DA /* OpenConnectGUI */,
-				E2CEC0B8FE4C88FC103E0D2E /* OpenConnectPacketTunnel */,
 				DB827C2A2268E159D6D8D2B2 /* OpenConnectPrivilegedHelper */,
 				42C752989CBAA7D705831C39 /* OpenConnectiOS */,
+				E2CEC0B8FE4C88FC103E0D2E /* OpenConnectPacketTunnel */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		42A4AC3EDE934612631B5DF3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0D955BA9E10E6F1A33EC78B2 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5D0157285A870FEDF3E078F6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				FCEC46B48FC2D89C1E7C475A /* Assets.xcassets in Resources */,
+				B8DDB11173345BFD8F951E51 /* Localizable.xcstrings in Resources */,
 				FA59AF06C6BB0DE54D276D4C /* vpnc-script in Resources */,
 				D6B2C5BB10CF0AE620387891 /* vpnc-wrapper.sh in Resources */,
 			);
@@ -403,6 +418,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A473D231A7FA141126FBCDCE /* Assets.xcassets in Resources */,
+				C8823209F1D48B34D578ECDB /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

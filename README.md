@@ -2,6 +2,8 @@
 
 原生 SwiftUI macOS 与 iOS 客户端，内置 OpenConnect 连接 VPN。支持多个连接、Cisco AnyConnect 等 OpenConnect 协议、用户名和密码保存、远程或本地 DNS、断线自动重连、连接状态与日志。
 
+界面提供英文与简体中文，跟随系统语言切换。文案以英文为源语言，翻译集中在 `Resources/Localizable.xcstrings`，macOS App、iOS App 与 VPN 扩展共用。特权辅助服务以 root 运行、拿不到用户的语言设置，所以它只回英文，由 App 按同一份字符串表翻译后再显示；扩展里 C 代码打出的提示经 `CFBundleCopyLocalizedString` 查表。新增文案时要把英文原文作为 key 加进字符串表。
+
 扁平图标的绘制源文件是 `Tools/GenerateFlatLogo.swift`；在项目根目录运行 `swift Tools/GenerateFlatLogo.swift` 可重新生成 macOS 和 iOS 的图标尺寸。
 
 ## 安装与构建

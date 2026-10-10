@@ -82,7 +82,7 @@ final class OpenConnectTunnel {
         // A paused main loop returns 0 and is restarted at once, so a live
         // session reconnects over the new interface with its existing cookie.
         if available, inMainLoop, let session {
-            log.append(regained ? "网络已恢复，正在重新连接。" : "网络已切换，正在重新连接。")
+            log.append(regained ? String(localized: "Network restored; reconnecting.") : String(localized: "Network changed; reconnecting."))
             ocs_session_send_command(session, CChar(UInt8(ascii: "p")))
         }
         condition.broadcast()
@@ -113,7 +113,7 @@ final class OpenConnectTunnel {
                 failures += 1
                 provider?.reasserting = true
                 let delay = min(60, 2 << min(failures, 5))
-                log.append("\(message) \(delay) 秒后重新连接（第 \(failures) 次）。", error: true)
+                log.append(String(localized: "\(message) Reconnecting in \(delay) s (attempt \(failures))."), error: true)
                 pause(seconds: TimeInterval(delay))
                 continue
             }
@@ -134,7 +134,7 @@ final class OpenConnectTunnel {
             guard let context else { return }
             Unmanaged<OpenConnectTunnel>.fromOpaque(context).takeUnretainedValue().sessionReconnected()
         }, context) else {
-            return .failed("无法初始化 OpenConnect。")
+            return .failed(String(localized: "Could not initialize OpenConnect."))
         }
 
         condition.lock()
@@ -153,20 +153,20 @@ final class OpenConnectTunnel {
             ocs_session_free(newSession)
         }
 
-        log.append("正在连接 \(profile.server)…")
+        log.append(String(localized: "Connecting to \(profile.server)…"))
         let connectResult = ocs_session_connect(newSession, serverURL)
         if isStopping { return .stopped }
         if connectResult != 0 {
             if ocs_session_auth_failed(newSession) != 0 {
-                return .authenticationFailed("VPN 认证失败：保存的账号或密码无效，或服务器要求二次验证。请在 App 中更新后重新连接。")
+                return .authenticationFailed(String(localized: "VPN authentication failed: the saved username or password is invalid, or the server requires two-factor authentication. Update it in the app and connect again."))
             }
-            return .failed("无法连接 VPN 服务器：\(log.lastError ?? errorText(connectResult))")
+            return .failed(String(localized: "Could not connect to the VPN server: \(log.lastError ?? errorText(connectResult))"))
         }
 
         let vpninfo = ocs_session_vpninfo(newSession)
-        guard let settings = networkSettings(vpninfo) else { return .failed("服务器没有分配 VPN 地址。") }
+        guard let settings = networkSettings(vpninfo) else { return .failed(String(localized: "The server did not assign a VPN address.")) }
         if let error = apply(settings.settings) {
-            return .failed("无法应用 VPN 网络设置：\(error.localizedDescription)")
+            return .failed(String(localized: "Could not apply the VPN network settings: \(error.localizedDescription)"))
         }
         appliedSettingsSignature = settings.signature
         _ = openconnect_setup_dtls(vpninfo, 60)
@@ -174,13 +174,13 @@ final class OpenConnectTunnel {
             let descriptor = try bridge.makeTunnelDescriptor()
             guard openconnect_setup_tun_fd(vpninfo, descriptor) == 0 else {
                 close(descriptor)
-                return .failed("无法建立数据通道。")
+                return .failed(String(localized: "Could not set up the data channel."))
             }
         } catch {
-            return .failed("无法建立数据通道：\(error.localizedDescription)")
+            return .failed(String(localized: "Could not set up the data channel: \(error.localizedDescription)"))
         }
 
-        log.append("VPN 已连接。")
+        log.append(String(localized: "VPN connected."))
         if !established {
             established = true
             completeStart(nil)
@@ -202,9 +202,9 @@ final class OpenConnectTunnel {
 
         if isStopping || result == -EINTR { return .stopped }
         switch result {
-        case -EPERM: return .disconnected("登录会话已过期。")
-        case -EPIPE: return .disconnected("服务器结束了会话。")
-        default: return .disconnected("VPN 连接中断（\(errorText(result))）。")
+        case -EPERM: return .disconnected(String(localized: "The login session expired."))
+        case -EPIPE: return .disconnected(String(localized: "The server ended the session."))
+        default: return .disconnected(String(localized: "The VPN connection was interrupted (\(errorText(result)))."))
         }
     }
 
@@ -218,7 +218,7 @@ final class OpenConnectTunnel {
         guard let current, let settings = networkSettings(ocs_session_vpninfo(current)),
               settings.signature != appliedSettingsSignature else { return }
         if let error = apply(settings.settings) {
-            log.append("更新 VPN 网络设置失败：\(error.localizedDescription)", error: true)
+            log.append(String(localized: "Failed to update the VPN network settings: \(error.localizedDescription)"), error: true)
         } else {
             appliedSettingsSignature = settings.signature
         }
@@ -235,7 +235,7 @@ final class OpenConnectTunnel {
         condition.unlock()
 
         if !established {
-            completeStart(transferable(error ?? TunnelError.connection("连接已取消。")))
+            completeStart(transferable(error ?? TunnelError.connection(String(localized: "Connection cancelled."))))
         } else if !wasStopping {
             provider?.cancelTunnelWithError(error.map(transferable))
         }
@@ -272,7 +272,7 @@ final class OpenConnectTunnel {
     private func waitForNetwork() -> Bool {
         condition.lock()
         defer { condition.unlock() }
-        if !networkAvailable && !stopping { log.append("等待网络恢复…") }
+        if !networkAvailable && !stopping { log.append(String(localized: "Waiting for the network…")) }
         while !networkAvailable && !stopping {
             condition.wait(until: Date().addingTimeInterval(30))
         }
@@ -297,7 +297,7 @@ final class OpenConnectTunnel {
     }
 
     private func apply(_ settings: NEPacketTunnelNetworkSettings) -> Error? {
-        guard let provider else { return TunnelError.connection("VPN 扩展已退出。") }
+        guard let provider else { return TunnelError.connection(String(localized: "The VPN extension has exited.")) }
         let semaphore = DispatchSemaphore(value: 0)
         var result: Error?
         provider.setTunnelNetworkSettings(settings) { error in
