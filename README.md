@@ -17,6 +17,8 @@ xcodebuild -project OpenConnectGUI.xcodeproj -scheme OpenConnectGUI -configurati
 
 `Vendor/OpenConnect/` 是预编译的 OpenConnect 9.21（静态链接 OpenSSL 3.5.9，仅 arm64）：macOS 命令行程序 `macos/openconnect`、iOS 静态库 `OpenConnect.xcframework`，以及 `vpnc-script`。它们只依赖系统自带的 libxml2、zlib、iconv。运行 `Scripts/build-openconnect.sh` 可从固定版本、校验过 SHA-256 的源码重新生成，只需 Xcode 命令行工具。许可证见 `Vendor/OpenConnect/licenses/`。
 
+推送 `main-vX.Y.Z` 格式的 tag 会触发 GitHub Actions（`.github/workflows/release.yml`）：用 Developer ID 签名、打成 dmg 并经 Apple 公证后发布到 Releases。签名证书与公证 API Key 来自组织级 secrets `APPLE_SIGN_*` / `APPLE_NOTARY_*`。
+
 macOS target 默认使用项目配置的 Developer ID 签名。要安装并使用特权辅助服务，需用同一开发团队的有效证书签署 App 与辅助服务，再将签名后的 App 安装到 `/Applications`。首次运行需在系统设置批准后台服务。仅用于编译验证时可在构建命令末尾添加 `CODE_SIGNING_ALLOWED=NO`。
 
 构建时 `openconnect` 被签名后放进 `Contents/MacOS/`，`vpnc-script` 放进 `Contents/Resources/`；内置 OpenSSL 使用系统证书 `/etc/ssl/cert.pem` 校验服务器。macOS 版包含使用 `SMAppService` 注册的特权辅助服务；首次安装后需在“系统设置 → 通用 → 登录项与扩展”批准它，之后连接和断开通过限定用途的 XPC 接口完成。应用及辅助服务必须使用同一开发团队的有效签名；仅用 `CODE_SIGNING_ALLOWED=NO` 构建的版本不能注册服务。VPN 密码保存在本机钥匙串，连接时通过 XPC 交给辅助服务，再经标准输入传给 OpenConnect，不出现在命令参数或配置文件中。配置和日志保存在 `~/Library/Application Support/OpenConnectGUI/`，进程号文件保存在 `/var/run/vpnc/`。

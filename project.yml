@@ -54,6 +54,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: xyz.nows.openconnect
         PRODUCT_NAME: OpenConnectGUI
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SWIFT_VERSION: 5.0
         ARCHS: arm64
