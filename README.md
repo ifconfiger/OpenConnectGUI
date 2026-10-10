@@ -1,51 +1,61 @@
 # OpenConnect GUI
 
-原生 SwiftUI macOS 与 iOS 客户端，内置 OpenConnect 连接 VPN。支持多个连接、Cisco AnyConnect 等 OpenConnect 协议、用户名和密码保存、远程或本地 DNS、断线自动重连、连接状态与日志。
+Native SwiftUI clients for macOS and iOS with OpenConnect built in. They support multiple connections, Cisco AnyConnect and the other OpenConnect protocols, saved usernames and passwords, remote or local DNS, automatic reconnection, and connection status and logs.
 
-界面提供英文与简体中文，跟随系统语言切换。文案以英文为源语言，翻译集中在 `Resources/Localizable.xcstrings`，macOS App、iOS App 与 VPN 扩展共用。特权辅助服务以 root 运行、拿不到用户的语言设置，所以它只回英文，由 App 按同一份字符串表翻译后再显示；扩展里 C 代码打出的提示经 `CFBundleCopyLocalizedString` 查表。新增文案时要把英文原文作为 key 加进字符串表。
+The interface is available in English and Simplified Chinese and follows the system language. English is the source language; translations live in `Resources/Localizable.xcstrings`, shared by the macOS app, the iOS app and the VPN extension. The privileged helper runs as root without the user's language settings, so it replies only in English and the app translates each reply against the same string catalog before showing it. Messages printed by the extension's C code are looked up with `CFBundleCopyLocalizedString`. When adding text, add the English original as a key to the string catalog.
 
-扁平图标的绘制源文件是 `Tools/GenerateFlatLogo.swift`；在项目根目录运行 `swift Tools/GenerateFlatLogo.swift` 可重新生成 macOS 和 iOS 的图标尺寸。
+The flat icon is drawn by `Tools/GenerateFlatLogo.swift`; run `swift Tools/GenerateFlatLogo.swift` from the project root to regenerate every macOS and iOS icon size.
 
-## 安装与构建
+## Installing and building
 
-要求 Apple 芯片 Mac（macOS 13+）和 Xcode。OpenConnect 已内置，无需安装 Homebrew 或其他依赖：
+Requires an Apple silicon Mac (macOS 13+) and Xcode. OpenConnect is bundled, so neither Homebrew nor any other dependency is needed:
 
 ```sh
 xcodegen generate
 xcodebuild -project OpenConnectGUI.xcodeproj -scheme OpenConnectGUI -configuration Release -derivedDataPath build-signed build
 ```
 
-`Vendor/OpenConnect/` 是预编译的 OpenConnect 9.21（静态链接 OpenSSL 3.5.9，仅 arm64）：macOS 命令行程序 `macos/openconnect`、iOS 静态库 `OpenConnect.xcframework`，以及 `vpnc-script`。它们只依赖系统自带的 libxml2、zlib、iconv。运行 `Scripts/build-openconnect.sh` 可从固定版本、校验过 SHA-256 的源码重新生成，只需 Xcode 命令行工具。许可证见 `Vendor/OpenConnect/licenses/`。
+`Vendor/OpenConnect/` holds a prebuilt OpenConnect 9.21 (statically linked against OpenSSL 3.5.9, arm64 only): the macOS command-line tool `macos/openconnect`, the iOS static library `OpenConnect.xcframework`, and `vpnc-script`. They depend only on the system's libxml2, zlib and iconv. `Scripts/build-openconnect.sh` rebuilds them from pinned, SHA-256-verified sources and needs only the Xcode command-line tools. Licenses are in `Vendor/OpenConnect/licenses/`.
 
-推送 `main-vX.Y.Z` 格式的 tag 会触发 GitHub Actions（`.github/workflows/release.yml`）：用 Developer ID 签名、打成 dmg 并经 Apple 公证后发布到 Releases。签名证书与公证 API Key 来自组织级 secrets `APPLE_SIGN_*` / `APPLE_NOTARY_*`。
+Pushing a tag of the form `main-vX.Y.Z` triggers GitHub Actions (`.github/workflows/release.yml`), which signs the app with Developer ID, packages it as a dmg, has Apple notarize it and publishes it to Releases. The signing certificate and notarization API key come from the organization secrets `APPLE_SIGN_*` / `APPLE_NOTARY_*`.
 
-macOS target 默认使用项目配置的 Developer ID 签名。要安装并使用特权辅助服务，需用同一开发团队的有效证书签署 App 与辅助服务，再将签名后的 App 安装到 `/Applications`。首次运行需在系统设置批准后台服务。仅用于编译验证时可在构建命令末尾添加 `CODE_SIGNING_ALLOWED=NO`。
+### Automatic updates
 
-构建时 `openconnect` 被签名后放进 `Contents/MacOS/`，`vpnc-script` 放进 `Contents/Resources/`；内置 OpenSSL 使用系统证书 `/etc/ssl/cert.pem` 校验服务器。macOS 版包含使用 `SMAppService` 注册的特权辅助服务；首次安装后需在“系统设置 → 通用 → 登录项与扩展”批准它，之后连接和断开通过限定用途的 XPC 接口完成。应用及辅助服务必须使用同一开发团队的有效签名；仅用 `CODE_SIGNING_ALLOWED=NO` 构建的版本不能注册服务。VPN 密码保存在本机钥匙串，连接时通过 XPC 交给辅助服务，再经标准输入传给 OpenConnect，不出现在命令参数或配置文件中。配置和日志保存在 `~/Library/Application Support/OpenConnectGUI/`，进程号文件保存在 `/var/run/vpnc/`。
+The macOS app updates itself from GitHub Releases. Every 6 hours it asks the GitHub API for the latest release of `ifconfiger/OpenConnectGUI`, and you can also choose "Check for Updates…" from the menu bar or the app menu. When the release tag `main-vX.Y.Z` is newer than the running `CFBundleShortVersionString`, the app downloads the release's `.dmg` in the background and copies the app out of it. It then replaces itself and relaunches once no VPN is connected, no reconnect is pending and the main window is closed; otherwise the update is installed when the app quits.
 
-日志标签显示当前连接尝试；每次新建连接时会清空上一次的日志。连接和保存失败会在窗口内提示。关闭主窗口后应用留在菜单栏，可从菜单栏重新打开窗口、连接、断开或退出。
+- **Verification**: there is no separate update-signing key. Before installing, the downloaded app must have this app's bundle identifier and the release's version, and must pass a strict code-signature check (including nested code) against a Developer ID requirement for the same team as the running copy. A build without a team, such as one signed ad hoc, never installs updates.
+- **Installation**: a detached shell script waits for the app to exit, swaps the bundles with rollback on failure, and reopens the app. If the app runs from a read-only or translocated location, it cannot replace itself; a manual check then opens the release page instead.
+- **Releases**: the workflow must attach the notarized `.dmg`. `releases/latest` excludes prereleases.
+- **Privileged helper**: an update replaces the helper binary inside the app bundle, but launchd keeps the old process running. On launch and before each helper call, the app compares its `CFBundleVersion` with the one the helper started from. If they differ, it asks the helper to exit once no OpenConnect session is running and no request is in flight; launchd starts the new binary on the next request. The service is not re-registered and needs no new approval. The 0.1.0 helper does not support this handshake; it keeps running until the next restart and stays compatible with the new app meanwhile.
+- **0.1.0 has no updater**: upgrading from 0.1.0 requires installing the new dmg by hand once.
 
-远程 DNS 使用 VPN 下发的解析服务器，由内置的 `vpnc-script` 配置；本地 DNS 模式保留 macOS 现有 DNS，同时照常配置 VPN 路由。断开按钮会等待 OpenConnect 进程退出；如果正常信号无效，会强制结束并用连接时保存的脚本环境清理路由与 DNS。自动重连开启时，断网后应用会暂停 VPN 并等待网络恢复；OpenConnect 对短暂中断最多重试 15 秒。VPN 进程退出后，应用最多尝试重连 3 次，网络恢复或切换时重新尝试；仍在运行的连接会在网络切换后刷新。手动断开不会触发重连。
+The macOS target signs with the project's Developer ID by default. To install and use the privileged helper, sign the app and the helper with a valid certificate from the same development team, then install the signed app in `/Applications`. On first launch, approve the background service in System Settings. For compile-only checks, append `CODE_SIGNING_ALLOWED=NO` to the build command.
 
-网络切换时，内置包装脚本会检查 VPN 入口是否仍有指向旧网关的静态主机路由，并在重新配置前移除；断开后也会清理这类残留路由。由于 OpenConnect 只在隧道建立后才运行脚本，这类残留路由会先让 `connect()` 以 `Can't assign requested address` 失败、从而挡住本该清理它的那次连接，因此辅助服务在启动 OpenConnect 之前会先解析服务器地址并单独剪掉它。DNS 解析结果无需更改。
+During the build, `openconnect` is signed and placed in `Contents/MacOS/`, and `vpnc-script` in `Contents/Resources/`; the bundled OpenSSL verifies servers against the system certificates in `/etc/ssl/cert.pem`. The macOS app includes a privileged helper registered with `SMAppService`. After the first install, approve it in System Settings → General → Login Items & Extensions; connecting and disconnecting then go through a narrowly scoped XPC interface. The app and the helper must carry valid signatures from the same development team; builds made with `CODE_SIGNING_ALLOWED=NO` cannot register the service. VPN passwords are kept in the local keychain, handed to the helper over XPC when connecting, and passed to OpenConnect on standard input, so they never appear in command arguments or configuration files. Settings and logs are stored in `~/Library/Application Support/OpenConnectGUI/`, PID files in `/var/run/vpnc/`.
 
-macOS 连接默认强制直连，不读取系统代理；旧配置中的代理地址也不会自动启用。只有在账号页明确打开“使用 HTTP 代理”并填写地址（如 `http://127.0.0.1:7897`）时，OpenConnect 才会经代理建立 HTTPS 隧道。代理地址不含用户名和密码。
+The Log tab shows the current connection attempt; the previous log is cleared whenever a new connection starts. Connection and save failures are reported in the window. After the main window is closed the app stays in the menu bar, from which you can reopen the window, connect, disconnect or quit.
 
-服务器证书无效（自签名、过期、域名不符）时，可在账号中开启“忽略证书错误（不安全）”：macOS 版连接前读取服务器当前证书，并用 `--servercert` 固定信任它；iOS 版直接接受该证书。这会失去对中间人攻击的防护，只建议在内网自签名证书的场景使用。
+Remote DNS uses the resolvers pushed by the VPN, configured by the bundled `vpnc-script`; local DNS mode keeps the existing macOS DNS while configuring VPN routes as usual. The Disconnect button waits for the OpenConnect process to exit; if the normal signals do not work, it kills the process and cleans up routes and DNS using the script environment saved at connect time. With automatic reconnection on, the app pauses the VPN when the network drops and waits for it to come back; OpenConnect retries short interruptions for up to 15 seconds. If the VPN process exits, the app tries to reconnect up to 3 times and tries again whenever the network comes back or changes; a running connection is refreshed after a network change. A manual disconnect never triggers a reconnect.
 
-连接失败时，辅助服务会把 OpenConnect 日志翻译成可操作的提示再交给界面。密码被拒最需要翻译：OpenConnect 收到服务器的 401 后会补一句“requested Basic authentication which is disabled by default”，但那只是它启动时就对所有服务器禁用了 HTTP Basic（`library.c` 初始化 `AUTH_DEFAULT_DISABLED`），与服务器要求无关，ocserv 的 401 响应里并没有 `WWW-Authenticate` 头。照字面去查代理或协议会走错方向，界面因此直接显示“服务器拒绝了用户名或密码”。
+On a network change, the bundled wrapper script checks whether the VPN server still has a static host route to the old gateway and removes it before reconfiguring; such leftover routes are also cleaned up after disconnecting. Because OpenConnect runs its script only after the tunnel is up, a leftover route would first make `connect()` fail with `Can't assign requested address`, blocking the very connection that should clean it up. The helper therefore resolves the server address and prunes that route on its own before starting OpenConnect. DNS results need no change.
 
-服务器需支持所选协议的用户名与密码登录。需要网页 SSO、客户端证书或交互式二次验证的网关，目前无法通过此界面完成登录。
+macOS connections are direct by default and ignore the system proxy; proxy addresses from older settings are not enabled automatically. OpenConnect builds its HTTPS tunnel through a proxy only when "Use HTTP Proxy" is explicitly turned on in the Account tab and an address such as `http://127.0.0.1:7897` is filled in. The proxy address carries no username or password.
 
-## iPhone 与 iPad
+When the server certificate is invalid (self-signed, expired or for the wrong host name), you can turn on "Ignore Certificate Errors (Insecure)" in the account. The macOS app then reads the server's current certificate before connecting and pins it with `--servercert`; the iOS app accepts the certificate directly. This gives up protection against man-in-the-middle attacks and is only advisable for self-signed certificates on internal networks.
 
-`OpenConnectiOS` 是 iPhone/iPad 的 SwiftUI App，`OpenConnectPacketTunnel` 是系统 VPN 扩展。扩展静态链接 `OpenConnect.xcframework`，在进程内完成 OpenConnect 认证和隧道，并用 `NEPacketTunnelFlow` 收发数据包；服务器证书用 iOS 系统信任库校验。
+When a connection fails, the helper turns the OpenConnect log into an actionable message for the interface. A rejected password needs this most: after the server's 401, OpenConnect adds "requested Basic authentication which is disabled by default", but that only reflects OpenConnect disabling HTTP Basic for every server at startup (`library.c` initializes `AUTH_DEFAULT_DISABLED`). It has nothing to do with what the server asked for, and ocserv's 401 response carries no `WWW-Authenticate` header. Taking it literally leads to chasing proxy or protocol problems, so the interface says directly that the server rejected the username or password.
 
-- **免重复输入密码**：密码保存在 App 与扩展共享的钥匙串访问组 `$(AppIdentifierPrefix)xyz.nows.openconnect.shared`。扩展启动时自动读取并回答登录表单（用户名、密码、认证组）。
-- **断线重连**：开启“断线自动重连”后会启用系统按需连接（On Demand），隧道断开后由系统自动拉起。扩展内部的处理：网络切换时立刻沿用现有会话重连；网络中断时等待恢复；会话过期或被服务器结束时，用保存的密码重新登录，并按 4–60 秒退避重试，期间状态显示“正在重新连接”。手动断开会关闭按需连接。
-- **防止账号锁定**：服务器拒绝保存的密码，或要求二次验证时，扩展会停止，不会重试。自动重连也不会再用同一组凭证尝试，直到你在 App 中更新密码或手动连接。
+The server must support username and password login for the chosen protocol. Gateways that require web SSO, client certificates or interactive two-factor authentication cannot be logged into from this interface yet.
 
-日志标签实时显示扩展日志；连接结束时会显示断开原因。需要网页 SSO、客户端证书或二次验证的网关暂不支持。实机运行需要包含 `packet-tunnel-provider` 和钥匙串共享权限的签名与 provisioning profile（团队 SWKH4B9DH8，自动签名）。模拟器编译命令：
+## iPhone and iPad
+
+`OpenConnectiOS` is the SwiftUI app for iPhone and iPad, and `OpenConnectPacketTunnel` is the system VPN extension. The extension statically links `OpenConnect.xcframework`, performs OpenConnect authentication and tunnelling in process, and moves packets through `NEPacketTunnelFlow`; server certificates are verified against the iOS system trust store.
+
+- **No retyping passwords**: passwords are stored in the keychain access group `$(AppIdentifierPrefix)xyz.nows.openconnect.shared`, shared by the app and the extension. On start, the extension reads them and answers the login form (username, password, auth group) automatically.
+- **Reconnecting**: turning on "Reconnect Automatically" enables system On Demand, so the system brings the tunnel back after it drops. Inside the extension, a network change reconnects immediately with the existing session; a network outage waits for the network to return; an expired or server-terminated session logs in again with the saved password, retrying with a 4–60 second backoff while the status shows "Reconnecting". A manual disconnect turns On Demand off.
+- **Avoiding account lockout**: if the server rejects the saved password or asks for two-factor authentication, the extension stops and does not retry. Automatic reconnection will not try the same credentials again until you update the password in the app or connect manually.
+
+The Log tab shows the extension log live, and the reason for disconnecting when a connection ends. Gateways that require web SSO, client certificates or two-factor authentication are not supported yet. Running on a device requires signing and a provisioning profile with the `packet-tunnel-provider` and keychain sharing entitlements (team SWKH4B9DH8, automatic signing). To compile for the simulator:
 
 ```sh
 xcodegen generate

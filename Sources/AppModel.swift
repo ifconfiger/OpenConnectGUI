@@ -40,6 +40,7 @@ final class AppModel: ObservableObject {
             if let first = profiles.first { select(first.id) }
             refresh()
             if let helperError = PrivilegedCommand.shared.prepare() { errorMessage = helperError }
+            Task.detached { PrivilegedCommand.shared.restartOutdatedHelper() }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -49,6 +50,10 @@ final class AppModel: ObservableObject {
 
     var selectedProfile: VPNProfile? { profiles.first { $0.id == selectedID } }
     var isConnected: Bool { connectedID == selectedID && connectedID != nil }
+    /// Nothing an update relaunch would interrupt: no tunnel, request or pending reconnect.
+    var canRelaunchForUpdate: Bool {
+        connectedID == nil && supervisedID == nil && !busy && !waitingForNetwork
+    }
     var canSave: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty &&
         !server.trimmingCharacters(in: .whitespaces).isEmpty &&

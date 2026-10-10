@@ -42,6 +42,7 @@
 		F79BF48D98278DF457AC22E9 /* OpenConnectMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B00F355CDA87714228CA /* OpenConnectMobileApp.swift */; };
 		F7C3D53AE288ED19DC51E602 /* OpenConnectTunnel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743FC707274CB8FA6172DF4 /* OpenConnectTunnel.swift */; };
 		F80144B0065165BB913B2CE2 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4FF96F129C9955E8E7DAAB /* Profile.swift */; };
+		FA488F109B6DED9C8BCFEEB2 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005F92D3EDA022400DD556BA /* UpdateController.swift */; };
 		FA59AF06C6BB0DE54D276D4C /* vpnc-script in Resources */ = {isa = PBXBuildFile; fileRef = F3BFF654B67096FDC678CDB3 /* vpnc-script */; };
 		FCEC46B48FC2D89C1E7C475A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CBFC0625B37175B4FA04072 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -88,6 +89,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		005F92D3EDA022400DD556BA /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		04BA9CAD8220E05D4C4D5687 /* OpenConnect.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OpenConnect.xcframework; path = Vendor/OpenConnect/OpenConnect.xcframework; sourceTree = "<group>"; };
 		06CF42CB6A543D5340D4A866 /* HelperProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperProtocol.swift; sourceTree = "<group>"; };
 		08F4338C09F6C57EE7461F9E /* NetworkPathObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPathObserver.swift; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 				3C64E5B19CA3FDC7D87BA6FA /* PrivilegedCommand.swift */,
 				DE4FF96F129C9955E8E7DAAB /* Profile.swift */,
 				959373107C77E2944FE8165C /* ProfileStore.swift */,
+				005F92D3EDA022400DD556BA /* UpdateController.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -484,6 +487,7 @@
 				E93C56A6654FB5572ECCE6B3 /* PrivilegedCommand.swift in Sources */,
 				190EFB305ACAF430CFEF7796 /* Profile.swift in Sources */,
 				DFCB79812B388EFD18CE558B /* ProfileStore.swift in Sources */,
+				FA488F109B6DED9C8BCFEEB2 /* UpdateController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

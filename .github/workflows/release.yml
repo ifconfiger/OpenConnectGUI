@@ -106,6 +106,7 @@ jobs:
           codesign --verify --verbose=2 "$DMG"
           echo "DMG=$DMG" >> "$GITHUB_ENV"
 
+      # 已安装的 App 通过 GitHub API 找到 latest release 里的 .dmg 自动更新，所以 Release 必须带 dmg 附件。
       # 公证 dmg 会同时覆盖其中的 App；票据钉在 dmg 上，离线打开也能通过 Gatekeeper
       - name: Notarize
         run: |
@@ -143,7 +144,7 @@ jobs:
           gh release create "$GITHUB_REF_NAME" "$DMG" "$DMG.sha256" \
             --title "OpenConnect GUI ${VERSION}" \
             --generate-notes \
-            --notes "仅支持 Apple Silicon (arm64)，macOS 13+。已使用 Developer ID 签名并通过 Apple 公证。打开 dmg 后将 OpenConnectGUI 拖入“应用程序”文件夹再运行，首次运行需在“系统设置 → 通用 → 登录项与扩展”批准后台服务。"
+            --notes "仅支持 Apple Silicon (arm64)，macOS 13+。已使用 Developer ID 签名并通过 Apple 公证。打开 dmg 后将 OpenConnectGUI 拖入“应用程序”文件夹再运行，首次运行需在“系统设置 → 通用 → 登录项与扩展”批准后台服务。之后的版本由 App 自动下载，校验为同一开发团队的 Developer ID 签名后，在未连接 VPN 且主窗口关闭时自动安装并重启。"
 
       - name: Clean up keychain
         if: always() && env.KEYCHAIN != ''

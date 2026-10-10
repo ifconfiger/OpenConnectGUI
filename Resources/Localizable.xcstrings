@@ -122,6 +122,17 @@
         }
       }
     },
+    "Check for Updates…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检查更新…"
+          }
+        }
+      }
+    },
     "Cleanup after the VPN exited failed: %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -375,6 +386,28 @@
         }
       }
     },
+    "Couldn't check for updates" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法检查更新"
+          }
+        }
+      }
+    },
+    "Couldn't install the update" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法安装更新"
+          }
+        }
+      }
+    },
     "Delete" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -562,6 +595,17 @@
         }
       }
     },
+    "GitHub returned HTTP %lld." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub 返回了 HTTP %lld。"
+          }
+        }
+      }
+    },
     "HTTP Proxy Address" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -591,6 +635,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已忽略证书错误：%s"
+          }
+        }
+      }
+    },
+    "Install and Relaunch" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安装并重新启动"
           }
         }
       }
@@ -650,6 +705,17 @@
         }
       }
     },
+    "It installs automatically once the VPN is disconnected and the main window is closed, or when you quit the app." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "断开 VPN 并关闭主窗口后会自动安装，或在退出 App 时安装。"
+          }
+        }
+      }
+    },
     "Keychain operation failed (%d)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -657,6 +723,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "钥匙串操作失败（%d）"
+          }
+        }
+      }
+    },
+    "Later" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "稍后"
           }
         }
       }
@@ -789,6 +866,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开主窗口"
+          }
+        }
+      }
+    },
+    "OpenConnect GUI %@ is ready to install" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenConnect GUI %@ 已准备好安装"
+          }
+        }
+      }
+    },
+    "OpenConnect GUI %@ is the latest version." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenConnect GUI %@ 是最新版本。"
+          }
+        }
+      }
+    },
+    "OpenConnect GUI can't replace itself in its current location. Download the new version from GitHub and move it to Applications." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenConnect GUI 无法在当前位置替换自身。请从 GitHub 下载新版本并移到“应用程序”文件夹。"
           }
         }
       }
@@ -1057,6 +1167,50 @@
         }
       }
     },
+    "The download failed." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载失败。"
+          }
+        }
+      }
+    },
+    "The downloaded app doesn't match this app's identity or version." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载的 App 与本 App 的标识或版本不符。"
+          }
+        }
+      }
+    },
+    "The downloaded app isn't signed by the same developer, so it was not installed." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载的 App 不是由同一开发者签名的，因此没有安装。"
+          }
+        }
+      }
+    },
+    "The downloaded package couldn't be unpacked." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法解开下载的安装包。"
+          }
+        }
+      }
+    },
     "The login session expired." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1086,6 +1240,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "特权辅助服务状态未知，请检查系统设置中的登录项。"
+          }
+        }
+      }
+    },
+    "The privileged helper is restarting after an update. Try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "特权辅助服务正在更新后重启，请重试。"
           }
         }
       }
@@ -1174,6 +1339,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "服务器拒绝了用户名或密码。请在账号设置中核对用户名并重新输入密码。"
+          }
+        }
+      }
+    },
+    "This release has no app package to install." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此版本没有可安装的 App 安装包。"
           }
         }
       }
@@ -1317,6 +1493,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在处理…"
+          }
+        }
+      }
+    },
+    "You have version %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前版本为 %@。"
+          }
+        }
+      }
+    },
+    "You're up to date" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已是最新版本"
           }
         }
       }

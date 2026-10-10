@@ -238,12 +238,64 @@ private func matchingPIDsForProcess(_ pid: pid_t) -> Bool {
     return command.0 == 0 && command.1.contains("--pid-file=/var/run/vpnc/openconnectgui-")
 }
 
+/// Whether any user still has an OpenConnect session started by this helper.
+private func anySessionRunning() -> Bool {
+    let result = run("/usr/bin/pgrep", ["-x", "openconnect"])
+    guard result.0 == 0 else { return false }
+    return result.1.split(whereSeparator: \.isNewline).compactMap { pid_t($0) }
+        .contains { $0 > 1 && matchingPIDsForProcess($0) }
+}
+
+/// The app build this process was started from. After an update replaces the bundle,
+/// launchd keeps running the old binary until it exits, so the app compares this with
+/// its own build and asks an outdated helper to restart.
+private let launchedVersion: String = {
+    guard let contents = executableDirectory()?.deletingLastPathComponent(),
+          let info = NSDictionary(contentsOf: contents.appendingPathComponent("Info.plist")) else { return "" }
+    return info["CFBundleVersion"] as? String ?? ""
+}()
+
+private let restartingMessage = "The privileged helper is restarting after an update. Try again."
+
+/// Counts requests in flight so the helper never exits in the middle of one.
+private final class HelperActivity {
+    private let lock = NSLock()
+    private var active = 0
+    private var exiting = false
+
+    func begin() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !exiting else { return false }
+        active += 1
+        return true
+    }
+
+    func end() {
+        lock.lock()
+        active -= 1
+        lock.unlock()
+    }
+
+    func beginExit() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard active == 0, !anySessionRunning() else { return false }
+        exiting = true
+        return true
+    }
+}
+
+private let activity = HelperActivity()
+
 private final class HelperSession: NSObject, OpenConnectHelperProtocol {
     private let uid: uid_t
     init(uid: uid_t) { self.uid = uid }
 
     func connect(_ profileData: Data, password: String, reply: @escaping (Int32, String) -> Void) {
+        guard activity.begin() else { reply(-1, restartingMessage); return }
         DispatchQueue.global(qos: .userInitiated).async { [self] in
+            defer { activity.end() }
             let result = start(profileData, password: password)
             reply(result.0, result.1)
         }
@@ -331,14 +383,18 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
     }
 
     func disconnect(_ profileID: String, reply: @escaping (Int32, String) -> Void) {
+        guard activity.begin() else { reply(-1, restartingMessage); return }
         DispatchQueue.global(qos: .userInitiated).async { [self] in
+            defer { activity.end() }
             let result = stop(profileID)
             reply(result.0, result.1)
         }
     }
 
     func cleanup(_ profileID: String, reply: @escaping (Int32, String) -> Void) {
+        guard activity.begin() else { reply(-1, restartingMessage); return }
         DispatchQueue.global(qos: .userInitiated).async {
+            defer { activity.end() }
             guard let id = UUID(uuidString: profileID) else { reply(-1, "Invalid connection ID."); return }
             let result = cleanupSavedSessions(id, knownPIDs: [])
             reply(result.error == nil ? 0 : -1, result.error ?? "")
@@ -346,7 +402,9 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
     }
 
     func refreshNetwork(_ profileID: String, reply: @escaping (Int32, String) -> Void) {
+        guard activity.begin() else { reply(-1, restartingMessage); return }
         DispatchQueue.global(qos: .userInitiated).async { [self] in
+            defer { activity.end() }
             guard let id = UUID(uuidString: profileID), let directory = sessionDirectory(uid, id) else {
                 reply(-1, "Invalid connection ID.")
                 return
@@ -357,6 +415,19 @@ private final class HelperSession: NSObject, OpenConnectHelperProtocol {
             guard !pids.isEmpty else { reply(-1, "The connection has ended."); return }
             let succeeded = pids.map { kill($0, SIGUSR2) == 0 }.allSatisfy { $0 }
             reply(succeeded ? 0 : -1, succeeded ? "" : "Could not tell OpenConnect to reconnect.")
+        }
+    }
+
+    func helperVersion(reply: @escaping (String) -> Void) {
+        reply(launchedVersion)
+    }
+
+    func restartIfIdle(reply: @escaping (Bool) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard activity.beginExit() else { reply(false); return }
+            reply(true)
+            // Give the reply time to reach the app; launchd starts the new binary on demand.
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) { exit(0) }
         }
     }
 

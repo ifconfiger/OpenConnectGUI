@@ -20,6 +20,7 @@ final class OpenConnectAppDelegate: NSObject, NSApplicationDelegate {
 struct OpenConnectGUIApp: App {
     @NSApplicationDelegateAdaptor(OpenConnectAppDelegate.self) private var appDelegate
     @StateObject private var model = AppModel()
+    @StateObject private var updates = UpdateController()
     private let timer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
 
     init() {
@@ -52,18 +53,28 @@ struct OpenConnectGUIApp: App {
                 .frame(minWidth: 740, minHeight: 540)
         }
         .windowResizability(.contentMinSize)
+        .commands {
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") { updates.checkForUpdates(idle: model.canRelaunchForUpdate) }
+                    .disabled(updates.isChecking)
+            }
+        }
 
         MenuBarExtra {
-            MenuBarContent(model: model)
+            MenuBarContent(model: model, updates: updates)
         } label: {
             Image(systemName: model.connectedID == nil ? "network" : "network.badge.shield.half.filled")
-                .onReceive(timer) { _ in if !model.busy { model.refresh() } }
+                .onReceive(timer) { _ in
+                    if !model.busy { model.refresh() }
+                    updates.tick(idle: model.canRelaunchForUpdate)
+                }
         }
     }
 }
 
 private struct MenuBarContent: View {
     @ObservedObject var model: AppModel
+    @ObservedObject var updates: UpdateController
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
@@ -81,6 +92,8 @@ private struct MenuBarContent: View {
                 .disabled(model.busy || !model.canSave || model.connectedID != nil)
         }
         Divider()
+        Button("Check for Updates…") { updates.checkForUpdates(idle: model.canRelaunchForUpdate) }
+            .disabled(updates.isChecking)
         Button("Quit OpenConnect GUI") { NSApp.terminate(nil) }
     }
 }

@@ -49,30 +49,73 @@ final class PrivilegedCommand {
         }
     }
 
+    private let restartLock = NSLock()
+    private var helperIsCurrent = false
+
+    /// An app update replaces the helper binary in the bundle, but launchd keeps the
+    /// previous helper process running until it exits. Ask an outdated helper to exit
+    /// while no VPN is up so the next request starts the new binary.
+    func restartOutdatedHelper() {
+        restartLock.lock()
+        defer { restartLock.unlock() }
+        guard !helperIsCurrent, service.status == .enabled else { return }
+        let expected = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
+        switch send(timeout: 5, { helper, reply in helper.helperVersion(reply: reply) }) {
+        case .success(let version) where version == expected:
+            helperIsCurrent = true
+        case .success:
+            guard case .success(true) = send(timeout: 10, { helper, reply in helper.restartIfIdle(reply: reply) })
+            else { return }
+            // The helper exits shortly after replying and refuses requests until then.
+            Thread.sleep(forTimeInterval: 1)
+            helperIsCurrent = true
+        case .failure:
+            // Helpers from 0.1.0 cannot answer or exit on request. Re-registering would
+            // stop them but sends the daemon back to System Settings for approval, so
+            // keep the old one: it serves every request this app makes until the next boot.
+            helperIsCurrent = true
+        }
+    }
+
     private func call(_ invoke: (OpenConnectHelperProtocol, @escaping (Int32, String) -> Void) -> Void)
         -> (status: Int32, output: String) {
+        restartOutdatedHelper()
         do { try ensureRegistered() }
         catch { return (-1, error.localizedDescription) }
 
+        switch send(timeout: 120, { helper, reply in invoke(helper) { reply(($0, $1)) } }) {
+        case .success(let (status, message)): return (status, HelperMessage.localized(message))
+        case .failure(let error): return (-1, error.localizedDescription)
+        }
+    }
+
+    private func send<Reply>(timeout: TimeInterval,
+                             _ invoke: (OpenConnectHelperProtocol, @escaping (Reply) -> Void) -> Void)
+        -> Result<Reply, NSError> {
+        func failure(_ message: String) -> NSError {
+            NSError(domain: "OpenConnectGUI", code: 4, userInfo: [NSLocalizedDescriptionKey: message])
+        }
         let connection = NSXPCConnection(machServiceName: HelperService.name, options: .privileged)
         connection.remoteObjectInterface = NSXPCInterface(with: OpenConnectHelperProtocol.self)
         connection.resume()
         defer { connection.invalidate() }
         let semaphore = DispatchSemaphore(value: 0)
         let lock = NSLock()
-        var result: (Int32, String) = (-1, String(localized: "The privileged helper did not respond."))
-        let finish: (Int32, String) -> Void = { status, message in
+        var result: Result<Reply, NSError> = .failure(failure(String(localized: "The privileged helper did not respond.")))
+        let finish: (Result<Reply, NSError>) -> Void = { value in
             lock.lock()
-            result = (status, message)
+            result = value
             lock.unlock()
             semaphore.signal()
         }
         guard let proxy = connection.remoteObjectProxyWithErrorHandler({ error in
-            finish(-1, String(localized: "Could not connect to the privileged helper: \(error.localizedDescription)"))
-        }) as? OpenConnectHelperProtocol else { return (-1, String(localized: "Could not create a connection to the privileged helper.")) }
-        invoke(proxy) { status, message in finish(status, HelperMessage.localized(message)) }
-        guard semaphore.wait(timeout: .now() + 120) == .success else {
-            return (-1, String(localized: "Timed out waiting for the privileged helper."))
+            finish(.failure(failure(String(localized: "Could not connect to the privileged helper: \(error.localizedDescription)"))))
+        }) as? OpenConnectHelperProtocol else {
+            return .failure(failure(String(localized: "Could not create a connection to the privileged helper.")))
+        }
+        invoke(proxy) { finish(.success($0)) }
+        guard semaphore.wait(timeout: .now() + timeout) == .success else {
+            return .failure(failure(String(localized: "Timed out waiting for the privileged helper.")))
         }
         lock.lock()
         defer { lock.unlock() }
